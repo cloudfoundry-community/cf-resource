@@ -11,13 +11,10 @@ One
   deployment.
 * `username`: *Required.* The username used to authenticate.
 * `password`: *Required.* The password used to authenticate.
-* `organization`: *Optional†.* The organization to push the application to.
-* `organisation`: *Optional†.* The organisation to push the application to. 
+* `organization`: *Required.* The organization to push the application to.
 * `space`: *Required.* The space to push the application to.
 * `skip_cert_check`: *Optional.* Check the validity of the CF SSL cert.
   Defaults to `false`.
-
-† One of `organization` or `organisation` must be specified.
 
 ## Behaviour
 
