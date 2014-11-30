@@ -42,6 +42,18 @@ var _ = Describe("Out Command", func() {
 			Ω(err).ShouldNot(HaveOccurred())
 
 			Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+			Ω(response.Metadata[0]).Should(Equal(
+				out.MetadataPair{
+					Name:  "organization",
+					Value: "secret",
+				},
+			))
+			Ω(response.Metadata[1]).Should(Equal(
+				out.MetadataPair{
+					Name:  "space",
+					Value: "volcano-base",
+				},
+			))
 
 			By("logging in")
 			Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))

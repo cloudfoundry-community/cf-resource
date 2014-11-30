@@ -43,5 +43,15 @@ func (command *Command) Run(request Request) (Response, error) {
 		Version: Version{
 			Timestamp: time.Now(),
 		},
+		Metadata: []MetadataPair{
+			MetadataPair{
+				Name:  "organization",
+				Value: request.Source.Organization,
+			},
+			MetadataPair{
+				Name:  "space",
+				Value: request.Source.Space,
+			},
+		},
 	}, nil
 }
