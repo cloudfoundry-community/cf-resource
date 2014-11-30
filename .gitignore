@@ -24,4 +24,6 @@ _testmain.go
 *.prof
 
 # Project Specific
-test.json
+/test.json
+/*.tar.gz
+/built*
