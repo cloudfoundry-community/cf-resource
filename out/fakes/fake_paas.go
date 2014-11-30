@@ -8,12 +8,13 @@ import (
 )
 
 type FakePAAS struct {
-	LoginStub        func(api string, username string, password string) error
+	LoginStub        func(api string, username string, password string, insecure bool) error
 	loginMutex       sync.RWMutex
 	loginArgsForCall []struct {
 		api      string
 		username string
 		password string
+		insecure bool
 	}
 	loginReturns struct {
 		result1 error
@@ -37,16 +38,17 @@ type FakePAAS struct {
 	}
 }
 
-func (fake *FakePAAS) Login(api string, username string, password string) error {
+func (fake *FakePAAS) Login(api string, username string, password string, insecure bool) error {
 	fake.loginMutex.Lock()
 	fake.loginArgsForCall = append(fake.loginArgsForCall, struct {
 		api      string
 		username string
 		password string
-	}{api, username, password})
+		insecure bool
+	}{api, username, password, insecure})
 	fake.loginMutex.Unlock()
 	if fake.LoginStub != nil {
-		return fake.LoginStub(api, username, password)
+		return fake.LoginStub(api, username, password, insecure)
 	} else {
 		return fake.loginReturns.result1
 	}
@@ -58,10 +60,10 @@ func (fake *FakePAAS) LoginCallCount() int {
 	return len(fake.loginArgsForCall)
 }
 
-func (fake *FakePAAS) LoginArgsForCall(i int) (string, string, string) {
+func (fake *FakePAAS) LoginArgsForCall(i int) (string, string, string, bool) {
 	fake.loginMutex.RLock()
 	defer fake.loginMutex.RUnlock()
-	return fake.loginArgsForCall[i].api, fake.loginArgsForCall[i].username, fake.loginArgsForCall[i].password
+	return fake.loginArgsForCall[i].api, fake.loginArgsForCall[i].username, fake.loginArgsForCall[i].password, fake.loginArgsForCall[i].insecure
 }
 
 func (fake *FakePAAS) LoginReturns(result1 error) {
