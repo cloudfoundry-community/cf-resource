@@ -15,6 +15,7 @@ func (command *Command) Run(request Request) (Response, error) {
 		request.Source.API,
 		request.Source.Username,
 		request.Source.Password,
+		request.Source.SkipCertCheck,
 	)
 	if err != nil {
 		return Response{}, err

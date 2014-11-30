@@ -43,10 +43,11 @@ var _ = Describe("Out Command", func() {
 			By("logging in")
 			Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))
 
-			api, username, password := cloudFoundry.LoginArgsForCall(0)
+			api, username, password, insecure := cloudFoundry.LoginArgsForCall(0)
 			Ω(api).Should(Equal("https://api.run.pivotal.io"))
 			Ω(username).Should(Equal("awesome@example.com"))
 			Ω(password).Should(Equal("hunter2"))
+			Ω(insecure).Should(Equal(false))
 
 			By("targetting the organization and space")
 			Ω(cloudFoundry.TargetCallCount()).Should(Equal(1))
@@ -91,6 +92,29 @@ var _ = Describe("Out Command", func() {
 			})
 		})
 
-		XIt("lets people skip the certificate check", func() {})
+		It("lets people skip the certificate check", func() {
+			request = out.Request{
+				Source: out.Source{
+					API:           "https://api.run.pivotal.io",
+					Username:      "awesome@example.com",
+					Password:      "hunter2",
+					Organization:  "secret",
+					Space:         "volcano-base",
+					SkipCertCheck: true,
+				},
+				Params: out.Params{
+					ManifestPath: "a/path/to/a/manifest.yml",
+				},
+			}
+
+			_, err := command.Run(request)
+			Ω(err).ShouldNot(HaveOccurred())
+
+			By("logging in")
+			Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))
+
+			_, _, _, insecure := cloudFoundry.LoginArgsForCall(0)
+			Ω(insecure).Should(Equal(true))
+		})
 	})
 })
