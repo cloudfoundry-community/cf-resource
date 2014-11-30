@@ -2,6 +2,7 @@ package out_test
 
 import (
 	"errors"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -37,8 +38,10 @@ var _ = Describe("Out Command", func() {
 
 	Describe("running the command", func() {
 		It("pushes an application into cloud foundry", func() {
-			_, err := command.Run(request)
+			response, err := command.Run(request)
 			Ω(err).ShouldNot(HaveOccurred())
+
+			Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
 
 			By("logging in")
 			Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))

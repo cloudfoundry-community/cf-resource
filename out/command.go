@@ -1,5 +1,7 @@
 package out
 
+import "time"
+
 type Command struct {
 	paas PAAS
 }
@@ -36,5 +38,9 @@ func (command *Command) Run(request Request) (Response, error) {
 		return Response{}, err
 	}
 
-	return Response{}, nil
+	return Response{
+		Version: Version{
+			Timestamp: time.Now(),
+		},
+	}, nil
 }

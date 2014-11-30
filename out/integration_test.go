@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -88,6 +89,8 @@ var _ = Describe("Out", func() {
 		var response out.Response
 		err = json.Unmarshal(session.Out.Contents(), &response)
 		Ω(err).ShouldNot(HaveOccurred())
+
+		Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
 
 		// shim outputs arguments
 		Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
