@@ -18,6 +18,7 @@ type Request struct {
 
 type Params struct {
 	ManifestPath string `json:"manifest"`
+	Path         string `json:"path"`
 }
 
 type Response struct {

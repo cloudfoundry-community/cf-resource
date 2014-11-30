@@ -62,8 +62,9 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
 
-			manifest := cloudFoundry.PushAppArgsForCall(0)
+			manifest, path := cloudFoundry.PushAppArgsForCall(0)
 			Ω(manifest).Should(Equal("a/path/to/a/manifest.yml"))
+			Ω(path).Should(Equal(""))
 		})
 
 		Describe("handling any errors", func() {

@@ -28,10 +28,11 @@ type FakePAAS struct {
 	targetReturns struct {
 		result1 error
 	}
-	PushAppStub        func(manifest string) error
+	PushAppStub        func(manifest string, path string) error
 	pushAppMutex       sync.RWMutex
 	pushAppArgsForCall []struct {
 		manifest string
+		path     string
 	}
 	pushAppReturns struct {
 		result1 error
@@ -106,14 +107,15 @@ func (fake *FakePAAS) TargetReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *FakePAAS) PushApp(manifest string) error {
+func (fake *FakePAAS) PushApp(manifest string, path string) error {
 	fake.pushAppMutex.Lock()
 	fake.pushAppArgsForCall = append(fake.pushAppArgsForCall, struct {
 		manifest string
-	}{manifest})
+		path     string
+	}{manifest, path})
 	fake.pushAppMutex.Unlock()
 	if fake.PushAppStub != nil {
-		return fake.PushAppStub(manifest)
+		return fake.PushAppStub(manifest, path)
 	} else {
 		return fake.pushAppReturns.result1
 	}
@@ -125,10 +127,10 @@ func (fake *FakePAAS) PushAppCallCount() int {
 	return len(fake.pushAppArgsForCall)
 }
 
-func (fake *FakePAAS) PushAppArgsForCall(i int) string {
+func (fake *FakePAAS) PushAppArgsForCall(i int) (string, string) {
 	fake.pushAppMutex.RLock()
 	defer fake.pushAppMutex.RUnlock()
-	return fake.pushAppArgsForCall[i].manifest
+	return fake.pushAppArgsForCall[i].manifest, fake.pushAppArgsForCall[i].path
 }
 
 func (fake *FakePAAS) PushAppReturns(result1 error) {

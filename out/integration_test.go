@@ -46,6 +46,7 @@ var _ = Describe("Out", func() {
 			},
 			Params: out.Params{
 				ManifestPath: "project/manifest.yml",
+				Path:         "another-project",
 			},
 		}
 		stdin := &bytes.Buffer{}
@@ -96,6 +97,9 @@ var _ = Describe("Out", func() {
 		Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 		Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
 		Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-		Ω(session.Err).Should(gbytes.Say("cf push -f %s", filepath.Join(tmpDir, "project/manifest.yml")))
+		Ω(session.Err).Should(gbytes.Say("cf push -f %s -p %s",
+			filepath.Join(tmpDir, "project/manifest.yml"),
+			filepath.Join(tmpDir, "another-project"),
+		))
 	})
 })

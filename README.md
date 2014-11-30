@@ -29,3 +29,5 @@ be specified.
 #### Parameters
 
 * `manifest`: *Required.* Path to a application manifest file.
+* `path`: *Optional.* Path to the application to push. If this isn't set then
+  it will be read from the manifest instead.

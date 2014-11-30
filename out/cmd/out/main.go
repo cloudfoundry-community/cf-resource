@@ -26,6 +26,10 @@ func main() {
 	// make it an absolute path
 	request.Params.ManifestPath = filepath.Join(os.Args[1], request.Params.ManifestPath)
 
+	if request.Params.Path != "" {
+		request.Params.Path = filepath.Join(os.Args[1], request.Params.Path)
+	}
+
 	response, err := command.Run(request)
 	if err != nil {
 		fatal("running command", err)

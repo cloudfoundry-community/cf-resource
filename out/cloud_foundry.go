@@ -8,7 +8,7 @@ import (
 type PAAS interface {
 	Login(api string, username string, password string, insecure bool) error
 	Target(organization string, space string) error
-	PushApp(manifest string) error
+	PushApp(manifest string, path string) error
 }
 
 type CloudFoundry struct{}
@@ -35,8 +35,13 @@ func (cf *CloudFoundry) Target(organization string, space string) error {
 	return cf.cf("target", "-o", organization, "-s", space).Run()
 }
 
-func (cf *CloudFoundry) PushApp(manifest string) error {
-	return cf.cf("push", "-f", manifest).Run()
+func (cf *CloudFoundry) PushApp(manifest string, path string) error {
+	args := []string{"push", "-f", manifest}
+	if path != "" {
+		args = append(args, "-p", path)
+	}
+
+	return cf.cf(args...).Run()
 }
 
 func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
