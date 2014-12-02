@@ -3,7 +3,14 @@
 go build -o built-out ./out/cmd/out
 go build -o built-check ./check/cmd/check
 
-go build -o autopilot github.com/concourse/autopilot
+(
+    $GOPATH/src/github.com/concourse/cf-resource
+
+    export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
+    export PATH=${PWD}/Godeps/_workspace/bin:$PATH
+
+    go build -o /tmp/autopilot github.com/concourse/autopilot
+)
 
 curl -L https://cli.run.pivotal.io/stable?release=linux64-binary > cf-linux.tar.gz
 tar -xvf cf-linux.tar.gz
