@@ -3,5 +3,7 @@
 go build -o built-out ./out/cmd/out
 go build -o built-check ./check/cmd/check
 
+go build -o autopilot github.com/concourse/autopilot
+
 curl -L https://cli.run.pivotal.io/stable?release=linux64-binary > cf-linux.tar.gz
 tar -xvf cf-linux.tar.gz

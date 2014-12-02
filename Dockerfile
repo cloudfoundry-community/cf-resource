@@ -7,5 +7,8 @@ RUN for cert in `ls -1 /etc/ssl/certs/*.crt | grep -v /etc/ssl/certs/ca-certific
     done
 
 ADD cf /usr/bin/cf
+ADD autopilot /usr/bin/autopilot
+RUN /usr/bin/cf install-plugin /usr/bin/autopilot
+
 ADD built-check /opt/resource/check
 ADD built-out /opt/resource/out
