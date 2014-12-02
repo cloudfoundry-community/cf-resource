@@ -1,10 +1,12 @@
 #!/bin/bash
 
+set -e
+
 go build -o built-out ./out/cmd/out
 go build -o built-check ./check/cmd/check
 
 (
-    $GOPATH/src/github.com/concourse/cf-resource
+    cd $GOPATH/src/github.com/concourse/autopilot
 
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
     export PATH=${PWD}/Godeps/_workspace/bin:$PATH
