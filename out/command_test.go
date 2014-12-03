@@ -74,9 +74,10 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
 
-			manifest, path := cloudFoundry.PushAppArgsForCall(0)
+			manifest, path, currentAppName := cloudFoundry.PushAppArgsForCall(0)
 			Ω(manifest).Should(Equal("a/path/to/a/manifest.yml"))
 			Ω(path).Should(Equal(""))
+			Ω(currentAppName).Should(Equal(""))
 		})
 
 		Describe("handling any errors", func() {
@@ -131,6 +132,31 @@ var _ = Describe("Out Command", func() {
 
 			_, _, _, insecure := cloudFoundry.LoginArgsForCall(0)
 			Ω(insecure).Should(Equal(true))
+		})
+
+		It("lets people do a zero downtime deploy", func() {
+			request = out.Request{
+				Source: out.Source{
+					API:            "https://api.run.pivotal.io",
+					Username:       "awesome@example.com",
+					Password:       "hunter2",
+					Organization:   "secret",
+					Space:          "volcano-base",
+					CurrentAppName: "cool-app-name",
+				},
+				Params: out.Params{
+					ManifestPath: "a/path/to/a/manifest.yml",
+				},
+			}
+
+			_, err := command.Run(request)
+			Ω(err).ShouldNot(HaveOccurred())
+
+			By("pushing the app")
+			Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
+
+			_, _, currentAppName := cloudFoundry.PushAppArgsForCall(0)
+			Ω(currentAppName).Should(Equal("cool-app-name"))
 		})
 	})
 })

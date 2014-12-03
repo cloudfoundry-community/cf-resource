@@ -3,12 +3,13 @@ package out
 import "time"
 
 type Source struct {
-	API           string `json:"api"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	Organization  string `json:"organization"`
-	Space         string `json:"space"`
-	SkipCertCheck bool   `json:"skip_cert_check"`
+	API            string `json:"api"`
+	Username       string `json:"username"`
+	Password       string `json:"password"`
+	Organization   string `json:"organization"`
+	Space          string `json:"space"`
+	SkipCertCheck  bool   `json:"skip_cert_check"`
+	CurrentAppName string `json:"current_app_name"`
 }
 
 type Request struct {

@@ -37,12 +37,13 @@ var _ = Describe("Out", func() {
 
 		request := out.Request{
 			Source: out.Source{
-				API:           "https://api.run.pivotal.io",
-				Username:      "awesome@example.com",
-				Password:      "hunter2",
-				Organization:  "org",
-				Space:         "space",
-				SkipCertCheck: true,
+				API:            "https://api.run.pivotal.io",
+				Username:       "awesome@example.com",
+				Password:       "hunter2",
+				Organization:   "org",
+				Space:          "space",
+				SkipCertCheck:  true,
+				CurrentAppName: "awesome-app",
 			},
 			Params: out.Params{
 				ManifestPath: "project/manifest.yml",
@@ -97,7 +98,7 @@ var _ = Describe("Out", func() {
 		Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 		Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
 		Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-		Ω(session.Err).Should(gbytes.Say("cf push -f %s -p %s",
+		Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
 			filepath.Join(tmpDir, "project/manifest.yml"),
 			filepath.Join(tmpDir, "another-project"),
 		))
