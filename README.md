@@ -5,8 +5,6 @@ Cloud Foundry deployment.
 
 ## Source Configuration
 
-One
-
 * `api`: *Required.* The address of the Cloud Controller in the Cloud Foundry
   deployment.
 * `username`: *Required.* The username used to authenticate.
