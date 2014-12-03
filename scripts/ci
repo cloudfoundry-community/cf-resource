@@ -1,0 +1,45 @@
+#!/bin/bash
+# vim: set ft=sh
+
+set -e
+
+export GOROOT=/usr/src/go
+export PATH=$GOROOT/bin:$PATH
+
+export GOPATH=$PWD/gopath
+export PATH=$GOPATH/bin:$PATH
+
+# run tests
+(
+    cd $GOPATH/src/github.com/concourse/cf-resource
+
+    export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
+    export PATH=${PWD}/Godeps/_workspace/bin:$PATH
+
+    go install github.com/onsi/ginkgo/ginkgo
+
+    ginkgo -r -p "$@"
+)
+
+# build & download binaries
+(
+    cd $GOPATH/src/github.com/concourse/autopilot
+
+    export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
+    export PATH=${PWD}/Godeps/_workspace/bin:$PATH
+
+    go build -o /tmp/autopilot github.com/concourse/autopilot
+)
+
+(
+    cd $GOPATH/src/github.com/concourse/cf-resource
+
+    export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
+    export PATH=${PWD}/Godeps/_workspace/bin:$PATH
+
+    go build -o built-out ./out/cmd/out
+    go build -o built-check ./check/cmd/check
+
+    curl -L https://cli.run.pivotal.io/stable?release=linux64-binary > cf-linux.tar.gz
+    tar -xvf cf-linux.tar.gz
+)

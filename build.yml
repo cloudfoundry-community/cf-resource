@@ -8,4 +8,4 @@ inputs:
     path: gopath/src/github.com/concourse/autopilot
 
 run:
-  path: gopath/src/github.com/concourse/cf-resource/scripts/test
+  path: gopath/src/github.com/concourse/cf-resource/scripts/ci
