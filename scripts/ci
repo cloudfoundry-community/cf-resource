@@ -11,6 +11,8 @@ export PATH=$GOPATH/bin:$PATH
 
 # run tests
 (
+    set -e
+
     cd $GOPATH/src/github.com/concourse/cf-resource
 
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
@@ -23,6 +25,8 @@ export PATH=$GOPATH/bin:$PATH
 
 # build & download binaries
 (
+    set -e
+
     cd $GOPATH/src/github.com/concourse/autopilot
 
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
@@ -32,6 +36,8 @@ export PATH=$GOPATH/bin:$PATH
 )
 
 (
+    set -e
+
     cd $GOPATH/src/github.com/concourse/cf-resource
 
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
@@ -42,4 +48,6 @@ export PATH=$GOPATH/bin:$PATH
 
     curl -L https://cli.run.pivotal.io/stable?release=linux64-binary > cf-linux.tar.gz
     tar -xvf cf-linux.tar.gz
+
+    mv /tmp/autopilot .
 )
