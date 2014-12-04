@@ -102,5 +102,8 @@ var _ = Describe("Out", func() {
 			filepath.Join(tmpDir, "project/manifest.yml"),
 			filepath.Join(tmpDir, "another-project"),
 		))
+
+		// color should be always
+		Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
 	})
 })
