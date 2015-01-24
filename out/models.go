@@ -3,13 +3,12 @@ package out
 import "time"
 
 type Source struct {
-	API            string `json:"api"`
-	Username       string `json:"username"`
-	Password       string `json:"password"`
-	Organization   string `json:"organization"`
-	Space          string `json:"space"`
-	SkipCertCheck  bool   `json:"skip_cert_check"`
-	CurrentAppName string `json:"current_app_name"`
+	API           string `json:"api"`
+	Username      string `json:"username"`
+	Password      string `json:"password"`
+	Organization  string `json:"organization"`
+	Space         string `json:"space"`
+	SkipCertCheck bool   `json:"skip_cert_check"`
 }
 
 type Request struct {
@@ -18,8 +17,9 @@ type Request struct {
 }
 
 type Params struct {
-	ManifestPath string `json:"manifest"`
-	Path         string `json:"path"`
+	ManifestPath   string `json:"manifest"`
+	Path           string `json:"path"`
+	CurrentAppName string `json:"current_app_name"`
 }
 
 type Response struct {

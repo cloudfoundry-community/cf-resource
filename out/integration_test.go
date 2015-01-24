@@ -37,17 +37,17 @@ var _ = Describe("Out", func() {
 
 		request := out.Request{
 			Source: out.Source{
-				API:            "https://api.run.pivotal.io",
-				Username:       "awesome@example.com",
-				Password:       "hunter2",
-				Organization:   "org",
-				Space:          "space",
-				SkipCertCheck:  true,
-				CurrentAppName: "awesome-app",
+				API:           "https://api.run.pivotal.io",
+				Username:      "awesome@example.com",
+				Password:      "hunter2",
+				Organization:  "org",
+				Space:         "space",
+				SkipCertCheck: true,
 			},
 			Params: out.Params{
-				ManifestPath: "project/manifest.yml",
-				Path:         "another-project",
+				ManifestPath:   "project/manifest.yml",
+				Path:           "another-project",
+				CurrentAppName: "awesome-app",
 			},
 		}
 		stdin := &bytes.Buffer{}

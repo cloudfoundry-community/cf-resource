@@ -34,7 +34,7 @@ func (command *Command) Run(request Request) (Response, error) {
 	err = command.paas.PushApp(
 		request.Params.ManifestPath,
 		request.Params.Path,
-		request.Source.CurrentAppName,
+		request.Params.CurrentAppName,
 	)
 	if err != nil {
 		return Response{}, err

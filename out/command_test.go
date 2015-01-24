@@ -137,15 +137,15 @@ var _ = Describe("Out Command", func() {
 		It("lets people do a zero downtime deploy", func() {
 			request = out.Request{
 				Source: out.Source{
-					API:            "https://api.run.pivotal.io",
-					Username:       "awesome@example.com",
-					Password:       "hunter2",
-					Organization:   "secret",
-					Space:          "volcano-base",
-					CurrentAppName: "cool-app-name",
+					API:          "https://api.run.pivotal.io",
+					Username:     "awesome@example.com",
+					Password:     "hunter2",
+					Organization: "secret",
+					Space:        "volcano-base",
 				},
 				Params: out.Params{
-					ManifestPath: "a/path/to/a/manifest.yml",
+					ManifestPath:   "a/path/to/a/manifest.yml",
+					CurrentAppName: "cool-app-name",
 				},
 			}
 

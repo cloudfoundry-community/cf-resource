@@ -13,9 +13,6 @@ Cloud Foundry deployment.
 * `space`: *Required.* The space to push the application to.
 * `skip_cert_check`: *Optional.* Check the validity of the CF SSL cert.
   Defaults to `false`.
-* `current_app_name`: *Optional.* This should be the name of the application
-  that this will re-deploy over. If this is set the resource will perform a
-  zero-downtime deploy.
 
 ## Behaviour
 
@@ -32,3 +29,6 @@ be specified.
 * `manifest`: *Required.* Path to a application manifest file.
 * `path`: *Optional.* Path to the application to push. If this isn't set then
   it will be read from the manifest instead.
+* `current_app_name`: *Optional.* This should be the name of the application
+  that this will re-deploy over. If this is set the resource will perform a
+  zero-downtime deploy.
