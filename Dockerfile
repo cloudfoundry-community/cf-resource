@@ -1,4 +1,4 @@
-FROM concourse/busyboxplus:base
+FROM concourse/busyboxplus:curl
 
 # satisfy go crypto/x509
 RUN cat /etc/ssl/certs/*.pem > /etc/ssl/certs/ca-certificates.crt
