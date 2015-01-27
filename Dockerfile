@@ -3,7 +3,7 @@ FROM progrium/busybox
 RUN opkg-install ca-certificates
 
 # satisfy go crypto/x509
-RUN cat /etc/ssl/certs/*.pem > /etc/ssl/certs/ca-certificates.crt
+RUN bash -c "cat /etc/ssl/certs/*.pem > /etc/ssl/certs/ca-certificates.crt"
 
 ADD cf /usr/bin/cf
 ADD autopilot /usr/bin/autopilot
