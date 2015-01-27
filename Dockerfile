@@ -1,4 +1,6 @@
-FROM concourse/busyboxplus:curl
+FROM progrium/busybox
+
+RUN opkg-install ca-certificates
 
 # satisfy go crypto/x509
 RUN cat /etc/ssl/certs/*.pem > /etc/ssl/certs/ca-certificates.crt
