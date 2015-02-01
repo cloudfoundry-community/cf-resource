@@ -3,9 +3,6 @@
 
 set -e
 
-export GOROOT=/usr/src/go
-export PATH=$GOROOT/bin:$PATH
-
 export GOPATH=$PWD/gopath
 export PATH=$GOPATH/bin:$PATH
 
@@ -45,9 +42,17 @@ export PATH=$GOPATH/bin:$PATH
 
     go build -o built-out ./out/cmd/out
     go build -o built-check ./check/cmd/check
+)
 
-    curl -L https://cli.run.pivotal.io/stable?release=linux64-binary > cf-linux.tar.gz
-    tar -xvf cf-linux.tar.gz
+(
+    set -e
 
-    mv /tmp/autopilot .
+    tar -xvf cf-cli/cf-linux-amd64.tgz
+    mv cf-cli/cf $GOPATH/src/github.com/concourse/cf-resource
+)
+
+(
+    set -e
+
+    mv /tmp/autopilot $GOPATH/src/github.com/concourse/cf-resource
 )
