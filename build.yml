@@ -7,7 +7,6 @@ inputs:
   - name: autopilot
     path: gopath/src/github.com/concourse/autopilot
   - name: cf-cli
-    path: gopath/src/github.com/concourse/cf-cli
 
 run:
   path: gopath/src/github.com/concourse/cf-resource/scripts/ci
