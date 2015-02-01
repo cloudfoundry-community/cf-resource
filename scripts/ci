@@ -29,8 +29,13 @@ export PATH=$GOPATH/bin:$PATH
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
     export PATH=${PWD}/Godeps/_workspace/bin:$PATH
 
-    go build -o autopilot github.com/concourse/autopilot
-    mv autopilot $GOPATH/src/github.com/concourse/cf-resource
+    go build -o /tmp/autopilot github.com/concourse/autopilot
+)
+
+(
+    set -e
+
+    mv /tmp/autopilot $GOPATH/src/github.com/concourse/cf-resource
 )
 
 (
@@ -49,7 +54,6 @@ export PATH=$GOPATH/bin:$PATH
     set -e
 
     tar -xvf cf-cli/cf-linux-amd64.tgz
-    ls -R cf-cli
     mv cf-cli/cf $GOPATH/src/github.com/concourse/cf-resource
 )
 
