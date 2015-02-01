@@ -47,6 +47,8 @@ export PATH=$GOPATH/bin:$PATH
 (
     set -e
 
+    ls
+
     tar -xvf cf-cli/cf-linux-amd64.tgz
     mv cf-cli/cf $GOPATH/src/github.com/concourse/cf-resource
 )
