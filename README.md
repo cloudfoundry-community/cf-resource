@@ -32,3 +32,37 @@ be specified.
 * `current_app_name`: *Optional.* This should be the name of the application
   that this will re-deploy over. If this is set the resource will perform a
   zero-downtime deploy.
+
+## Pipeline example
+
+```yaml
+---
+jobs:
+- name: job-deploy-app
+  public: true
+  serial: true
+  plan:
+  - aggregate:
+    - get: resource-web-app
+  - aggregate:
+    - put: resource-deploy-web-app
+      params:
+        manifest: resource-web-app/manifest.yml
+        path: resource-web-app
+
+resources:
+- name: resource-web-app
+  type: git
+  source:
+    uri: https://github.com/cloudfoundry-community/simple-go-web-app.git
+
+- name: resource-deploy-web-app
+  type: cf
+  source:
+    api: https://api.run.pivotal.io
+    username: EMAIL
+    password: PASSWORD
+    organization: ORG
+    space: SPACE
+    skip_cert_check: false
+```
