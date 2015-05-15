@@ -7,6 +7,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/concourse/cf-resource"
 	"github.com/concourse/cf-resource/out"
 	"github.com/concourse/cf-resource/out/fakes"
 )
@@ -23,7 +24,7 @@ var _ = Describe("Out Command", func() {
 		command = out.NewCommand(cloudFoundry)
 
 		request = out.Request{
-			Source: out.Source{
+			Source: resource.Source{
 				API:          "https://api.run.pivotal.io",
 				Username:     "awesome@example.com",
 				Password:     "hunter2",
@@ -43,13 +44,13 @@ var _ = Describe("Out Command", func() {
 
 			Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
 			Ω(response.Metadata[0]).Should(Equal(
-				out.MetadataPair{
+				resource.MetadataPair{
 					Name:  "organization",
 					Value: "secret",
 				},
 			))
 			Ω(response.Metadata[1]).Should(Equal(
-				out.MetadataPair{
+				resource.MetadataPair{
 					Name:  "space",
 					Value: "volcano-base",
 				},
@@ -111,7 +112,7 @@ var _ = Describe("Out Command", func() {
 
 		It("lets people skip the certificate check", func() {
 			request = out.Request{
-				Source: out.Source{
+				Source: resource.Source{
 					API:           "https://api.run.pivotal.io",
 					Username:      "awesome@example.com",
 					Password:      "hunter2",
@@ -136,7 +137,7 @@ var _ = Describe("Out Command", func() {
 
 		It("lets people do a zero downtime deploy", func() {
 			request = out.Request{
-				Source: out.Source{
+				Source: resource.Source{
 					API:          "https://api.run.pivotal.io",
 					Username:     "awesome@example.com",
 					Password:     "hunter2",

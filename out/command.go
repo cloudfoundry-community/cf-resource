@@ -1,6 +1,10 @@
 package out
 
-import "time"
+import (
+	"time"
+
+	"github.com/concourse/cf-resource"
+)
 
 type Command struct {
 	paas PAAS
@@ -41,15 +45,15 @@ func (command *Command) Run(request Request) (Response, error) {
 	}
 
 	return Response{
-		Version: Version{
+		Version: resource.Version{
 			Timestamp: time.Now(),
 		},
-		Metadata: []MetadataPair{
-			MetadataPair{
+		Metadata: []resource.MetadataPair{
+			{
 				Name:  "organization",
 				Value: request.Source.Organization,
 			},
-			MetadataPair{
+			{
 				Name:  "space",
 				Value: request.Source.Space,
 			},

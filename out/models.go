@@ -1,19 +1,10 @@
 package out
 
-import "time"
-
-type Source struct {
-	API           string `json:"api"`
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	Organization  string `json:"organization"`
-	Space         string `json:"space"`
-	SkipCertCheck bool   `json:"skip_cert_check"`
-}
+import "github.com/concourse/cf-resource"
 
 type Request struct {
-	Source Source `json:"source"`
-	Params Params `json:"params"`
+	Source resource.Source `json:"source"`
+	Params Params          `json:"params"`
 }
 
 type Params struct {
@@ -23,15 +14,6 @@ type Params struct {
 }
 
 type Response struct {
-	Version  Version        `json:"version"`
-	Metadata []MetadataPair `json:"metadata"`
-}
-
-type Version struct {
-	Timestamp time.Time `json:"timestamp"`
-}
-
-type MetadataPair struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
+	Version  resource.Version        `json:"version"`
+	Metadata []resource.MetadataPair `json:"metadata"`
 }

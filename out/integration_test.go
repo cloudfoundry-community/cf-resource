@@ -17,6 +17,7 @@ import (
 	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 
+	"github.com/concourse/cf-resource"
 	"github.com/concourse/cf-resource/out"
 )
 
@@ -36,7 +37,7 @@ var _ = Describe("Out", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 
 		request := out.Request{
-			Source: out.Source{
+			Source: resource.Source{
 				API:           "https://api.run.pivotal.io",
 				Username:      "awesome@example.com",
 				Password:      "hunter2",
