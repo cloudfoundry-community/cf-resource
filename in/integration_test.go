@@ -17,7 +17,7 @@ import (
 	"github.com/concourse/cf-resource/in"
 )
 
-var _ = Describe("Out", func() {
+var _ = Describe("In", func() {
 	var (
 		tmpDir   string
 		request  in.Request
