@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/types"
 )
@@ -54,8 +53,6 @@ func VerifyContentType(contentType string) http.HandlerFunc {
 func VerifyBasicAuth(username string, password string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		auth := req.Header.Get("Authorization")
-		Ω(auth).ShouldNot(Equal(""), "Authorization header must be specified")
-
 		decoded, err := base64.StdEncoding.DecodeString(auth[6:])
 		Ω(err).ShouldNot(HaveOccurred())
 

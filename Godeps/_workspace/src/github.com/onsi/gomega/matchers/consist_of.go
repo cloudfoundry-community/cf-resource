@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/onsi/gomega/format"
-	"github.com/onsi/gomega/matchers/support/goraph/bipartitegraph"
 )
 
 type ConsistOfMatcher struct {
@@ -26,13 +25,13 @@ func (matcher *ConsistOfMatcher) Match(actual interface{}) (success bool, err er
 		}
 	}
 
-	matchers := []interface{}{}
-	for _, element := range elements {
+	matchers := map[int]omegaMatcher{}
+	for i, element := range elements {
 		matcher, isMatcher := element.(omegaMatcher)
 		if !isMatcher {
 			matcher = &EqualMatcher{Expected: element}
 		}
-		matchers = append(matchers, matcher)
+		matchers[i] = matcher
 	}
 
 	values := matcher.valuesOf(actual)
@@ -41,17 +40,26 @@ func (matcher *ConsistOfMatcher) Match(actual interface{}) (success bool, err er
 		return false, nil
 	}
 
-	neighbours := func(v, m interface{}) (bool, error) {
-		match, err := m.(omegaMatcher).Match(v)
-		return match && err == nil, nil
+	for _, value := range values {
+		found := false
+		for key, matcher := range matchers {
+			success, err := matcher.Match(value)
+			if err != nil {
+				continue
+			}
+			if success {
+				found = true
+				delete(matchers, key)
+				break
+			}
+		}
+
+		if !found {
+			return false, nil
+		}
 	}
 
-	bipartiteGraph, err := bipartitegraph.NewBipartiteGraph(values, matchers, neighbours)
-	if err != nil {
-		return false, err
-	}
-
-	return len(bipartiteGraph.LargestMatching()) == len(values), nil
+	return true, nil
 }
 
 func (matcher *ConsistOfMatcher) valuesOf(actual interface{}) []interface{} {

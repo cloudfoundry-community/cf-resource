@@ -3,7 +3,6 @@ package asyncassertion_test
 import (
 	"errors"
 	"time"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	. "github.com/onsi/gomega/internal/asyncassertion"
@@ -28,27 +27,29 @@ var _ = Describe("Async Assertion", func() {
 	Describe("Eventually", func() {
 		Context("the positive case", func() {
 			It("should poll the function and matcher", func() {
-				counter := 0
-				a := New(AsyncAssertionTypeEventually, func() int {
-					counter++
-					return counter
+				arr := []int{}
+				a := New(AsyncAssertionTypeEventually, func() []int {
+					arr = append(arr, 1)
+					return arr
 				}, fakeFailHandler, time.Duration(0.2*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
 
-				a.Should(BeNumerically("==", 5))
+				a.Should(HaveLen(10))
+
+				Ω(arr).Should(HaveLen(10))
 				Ω(failureMessage).Should(BeZero())
 			})
 
 			It("should continue when the matcher errors", func() {
-				counter := 0
+				var arr = []int{}
 				a := New(AsyncAssertionTypeEventually, func() interface{} {
-					counter++
-					if counter == 5 {
-						return "not-a-number" //this should cause the matcher to error
+					arr = append(arr, 1)
+					if len(arr) == 4 {
+						return 0 //this should cause the matcher to error
 					}
-					return counter
+					return arr
 				}, fakeFailHandler, time.Duration(0.2*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
 
-				a.Should(BeNumerically("==", 5), "My description %d", 2)
+				a.Should(HaveLen(4), "My description %d", 2)
 
 				Ω(failureMessage).Should(ContainSubstring("Timed out after"))
 				Ω(failureMessage).Should(ContainSubstring("My description 2"))
@@ -56,18 +57,17 @@ var _ = Describe("Async Assertion", func() {
 			})
 
 			It("should be able to timeout", func() {
-				counter := 0
-				a := New(AsyncAssertionTypeEventually, func() int {
-					counter++
-					return counter
+				arr := []int{}
+				a := New(AsyncAssertionTypeEventually, func() []int {
+					arr = append(arr, 1)
+					return arr
 				}, fakeFailHandler, time.Duration(0.2*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
 
-				a.Should(BeNumerically(">", 100), "My description %d", 2)
+				a.Should(HaveLen(11), "My description %d", 2)
 
-				Ω(counter).Should(BeNumerically(">", 8))
-				Ω(counter).Should(BeNumerically("<=", 10))
+				Ω(arr).Should(HaveLen(10))
 				Ω(failureMessage).Should(ContainSubstring("Timed out after"))
-				Ω(failureMessage).Should(MatchRegexp(`\<int\>: \d`), "Should pass the correct value to the matcher message formatter.")
+				Ω(failureMessage).Should(ContainSubstring("<[]int | len:10"), "Should pass the correct value to the matcher message formatter.")
 				Ω(failureMessage).Should(ContainSubstring("My description 2"))
 				Ω(callerSkip).Should(Equal(4))
 			})
@@ -76,14 +76,18 @@ var _ = Describe("Async Assertion", func() {
 		Context("the negative case", func() {
 			It("should poll the function and matcher", func() {
 				counter := 0
-				a := New(AsyncAssertionTypeEventually, func() int {
+				arr := []int{}
+				a := New(AsyncAssertionTypeEventually, func() []int {
 					counter += 1
-					return counter
+					if counter >= 10 {
+						arr = append(arr, 1)
+					}
+					return arr
 				}, fakeFailHandler, time.Duration(0.2*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
 
-				a.ShouldNot(BeNumerically("<", 3))
+				a.ShouldNot(HaveLen(0))
 
-				Ω(counter).Should(Equal(3))
+				Ω(arr).Should(HaveLen(1))
 				Ω(failureMessage).Should(BeZero())
 			})
 
@@ -101,14 +105,14 @@ var _ = Describe("Async Assertion", func() {
 			})
 
 			It("should be able to timeout", func() {
-				a := New(AsyncAssertionTypeEventually, func() int {
-					return 0
-				}, fakeFailHandler, time.Duration(0.1*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
+				a := New(AsyncAssertionTypeEventually, func() []int {
+					return []int{}
+				}, fakeFailHandler, time.Duration(0.2*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
 
-				a.ShouldNot(Equal(0), "My description %d", 2)
+				a.ShouldNot(HaveLen(0), "My description %d", 2)
 
 				Ω(failureMessage).Should(ContainSubstring("Timed out after"))
-				Ω(failureMessage).Should(ContainSubstring("<int>: 0"), "Should pass the correct value to the matcher message formatter.")
+				Ω(failureMessage).Should(ContainSubstring("<[]int | len:0"), "Should pass the correct value to the matcher message formatter.")
 				Ω(failureMessage).Should(ContainSubstring("My description 2"))
 				Ω(callerSkip).Should(Equal(4))
 			})
@@ -137,23 +141,6 @@ var _ = Describe("Async Assertion", func() {
 				Ω(callerSkip).Should(Equal(4))
 			})
 		})
-
-		Context("Making an assertion without a registered fail handler", func() {
-			It("should panic", func() {
-				defer func() {
-					e := recover()
-					RegisterFailHandler(Fail)
-					if e == nil {
-						Fail("expected a panic to have occured")
-					}
-				}()
-
-				RegisterFailHandler(nil)
-				c := make(chan bool, 1)
-				c <- true
-				Eventually(c).Should(Receive())
-			})
-		})
 	})
 
 	Describe("Consistently", func() {
@@ -167,8 +154,7 @@ var _ = Describe("Async Assertion", func() {
 					}, fakeFailHandler, time.Duration(0.2*float64(time.Second)), time.Duration(0.02*float64(time.Second)), 1)
 
 					a.Should(Equal("foo"))
-					Ω(calls).Should(BeNumerically(">", 8))
-					Ω(calls).Should(BeNumerically("<=", 10))
+					Ω(calls).Should(Equal(10))
 					Ω(failureMessage).Should(BeZero())
 				})
 			})
@@ -178,7 +164,7 @@ var _ = Describe("Async Assertion", func() {
 					calls := 0
 					a := New(AsyncAssertionTypeConsistently, func() interface{} {
 						calls++
-						if calls > 5 {
+						if calls > 9 {
 							return "bar"
 						}
 						return "foo"
@@ -269,22 +255,6 @@ var _ = Describe("Async Assertion", func() {
 				Ω(failureMessage).Should(ContainSubstring("Error:"))
 				Ω(failureMessage).Should(ContainSubstring("bam"))
 				Ω(callerSkip).Should(Equal(4))
-			})
-		})
-
-		Context("Making an assertion without a registered fail handler", func() {
-			It("should panic", func() {
-				defer func() {
-					e := recover()
-					RegisterFailHandler(Fail)
-					if e == nil {
-						Fail("expected a panic to have occured")
-					}
-				}()
-
-				RegisterFailHandler(nil)
-				c := make(chan bool)
-				Consistently(c).ShouldNot(Receive())
 			})
 		})
 	})
