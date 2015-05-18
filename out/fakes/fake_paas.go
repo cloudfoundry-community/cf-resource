@@ -2,9 +2,8 @@
 package fakes
 
 import (
-	"sync"
-
 	"github.com/concourse/cf-resource/out"
+	"sync"
 )
 
 type FakePAAS struct {

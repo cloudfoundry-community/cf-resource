@@ -35,6 +35,10 @@ func (command *Command) Run(request Request) (Response, error) {
 		return Response{}, err
 	}
 
+	if err := command.setEnvironmentVariables(request); err != nil {
+		return Response{}, err
+	}
+
 	err = command.paas.PushApp(
 		request.Params.ManifestPath,
 		request.Params.Path,
@@ -59,4 +63,26 @@ func (command *Command) Run(request Request) (Response, error) {
 			},
 		},
 	}, nil
+}
+
+func (command *Command) setEnvironmentVariables(request Request) error {
+	if len(request.Params.EnvironmentVariables) == 0 {
+		return nil
+	}
+
+	manifest, err := NewManifest(request.Params.ManifestPath)
+	if err != nil {
+		return err
+	}
+
+	for key, value := range request.Params.EnvironmentVariables {
+		manifest.AddEnvironmentVariable(key, value)
+	}
+
+	err = manifest.Save(request.Params.ManifestPath)
+	if (err != nil) {
+		return err
+	}
+
+	return nil
 }

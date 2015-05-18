@@ -2,6 +2,7 @@ package out_test
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -10,6 +11,8 @@ import (
 	"github.com/concourse/cf-resource"
 	"github.com/concourse/cf-resource/out"
 	"github.com/concourse/cf-resource/out/fakes"
+	"io"
+	"io/ioutil"
 )
 
 var _ = Describe("Out Command", func() {
@@ -32,7 +35,7 @@ var _ = Describe("Out Command", func() {
 				Space:        "volcano-base",
 			},
 			Params: out.Params{
-				ManifestPath: "a/path/to/a/manifest.yml",
+				ManifestPath: "assets/manifest.yml",
 			},
 		}
 	})
@@ -76,7 +79,7 @@ var _ = Describe("Out Command", func() {
 			Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
 
 			manifest, path, currentAppName := cloudFoundry.PushAppArgsForCall(0)
-			Ω(manifest).Should(Equal("a/path/to/a/manifest.yml"))
+			Ω(manifest).Should(Equal("assets/manifest.yml"))
 			Ω(path).Should(Equal(""))
 			Ω(currentAppName).Should(Equal(""))
 		})
@@ -107,6 +110,66 @@ var _ = Describe("Out Command", func() {
 
 				_, err := command.Run(request)
 				Ω(err).Should(MatchError(expectedError))
+			})
+		})
+
+		Context("setting environment variables provided as params", func() {
+			var err error
+			var tempFile *os.File
+
+			BeforeEach(func() {
+				sourceFile, err := os.Open("assets/manifest.yml")
+				Ω(err).ShouldNot(HaveOccurred())
+				defer sourceFile.Close()
+
+				tempFile, err = ioutil.TempFile("assets", "command_test.yml_")
+				Ω(err).ShouldNot(HaveOccurred())
+				defer tempFile.Close()
+
+				_, err = io.Copy(tempFile, sourceFile)
+
+				request = out.Request{
+					Source: resource.Source{
+						API:          "https://api.run.pivotal.io",
+						Username:     "awesome@example.com",
+						Password:     "hunter2",
+						Organization: "secret",
+						Space:        "volcano-base",
+					},
+					Params: out.Params{
+						ManifestPath: tempFile.Name(),
+						EnvironmentVariables: map[string]string{
+							"COMMAND_TEST_A": "command_test_a",
+							"COMMAND_TEST_B": "command_test_b",
+						},
+					},
+				}
+				_, err = command.Run(request)
+			})
+
+			AfterEach(func() {
+				os.Remove(tempFile.Name())
+			})
+
+			It("does not raise an error", func() {
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+
+			It("writes the variables into the manifest", func() {
+				manifest, _ := out.NewManifest(request.Params.ManifestPath)
+
+				Ω(manifest.EnvironmentVariables()["COMMAND_TEST_A"]).Should(Equal("command_test_a"))
+				Ω(manifest.EnvironmentVariables()["COMMAND_TEST_B"]).Should(Equal("command_test_b"))
+			})
+		})
+
+		Context("no environment variables provided", func() {
+			It("doesn't set the environment variables", func() {
+				manifest, err := out.NewManifest(request.Params.ManifestPath)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(manifest.EnvironmentVariables()).Should(HaveLen(2))
+				Ω(manifest.EnvironmentVariables()).Should(HaveKeyWithValue("MANIFEST_A", "manifest_a"))
+				Ω(manifest.EnvironmentVariables()).Should(HaveKeyWithValue("MANIFEST_B", "manifest_b"))
 			})
 		})
 
