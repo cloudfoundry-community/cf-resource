@@ -48,6 +48,7 @@ export PATH=$GOPATH/bin:$PATH
 
     go build -o built-out ./out/cmd/out
     go build -o built-check ./check/cmd/check
+    go build -o built-in ./in/cmd/in
 )
 
 (
