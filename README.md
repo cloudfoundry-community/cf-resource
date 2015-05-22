@@ -42,13 +42,11 @@ jobs:
   public: true
   serial: true
   plan:
-  - aggregate:
-    - get: resource-web-app
-  - aggregate:
-    - put: resource-deploy-web-app
-      params:
-        manifest: resource-web-app/manifest.yml
-        path: resource-web-app
+  - get: resource-web-app
+  - put: resource-deploy-web-app
+    params:
+      manifest: resource-web-app/manifest.yml
+      path: resource-web-app
 
 resources:
 - name: resource-web-app
