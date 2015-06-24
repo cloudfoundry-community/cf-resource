@@ -47,6 +47,9 @@ jobs:
     params:
       manifest: resource-web-app/manifest.yml
       path: resource-web-app
+      environment_variables:
+        key: value
+        key2: value2
 
 resources:
 - name: resource-web-app

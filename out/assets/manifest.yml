@@ -1,0 +1,3 @@
+env:
+  MANIFEST_A: manifest_a
+  MANIFEST_B: manifest_b
