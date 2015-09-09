@@ -23,20 +23,27 @@ import (
 
 var _ = Describe("Out", func() {
 	var (
-		tmpDir string
-		cmd    *exec.Cmd
+		tmpDir  string
+		cmd     *exec.Cmd
+		request out.Request
 	)
 
 	BeforeEach(func() {
-		binPath, err := gexec.Build("github.com/concourse/cf-resource/out/cmd/out")
-		Ω(err).ShouldNot(HaveOccurred())
+		var err error
 
 		tmpDir, err = ioutil.TempDir("", "cf_resource_out")
-
-		assetsPath, err := filepath.Abs("assets")
 		Ω(err).ShouldNot(HaveOccurred())
 
-		request := out.Request{
+		err = os.Mkdir(filepath.Join(tmpDir, "project"), 0755)
+		Ω(err).ShouldNot(HaveOccurred())
+
+		err = ioutil.WriteFile(filepath.Join(tmpDir, "project", "manifest.yml"), []byte{}, 0555)
+		Ω(err).ShouldNot(HaveOccurred())
+
+		err = ioutil.WriteFile(filepath.Join(tmpDir, "another-project"), []byte{}, 0555)
+		Ω(err).ShouldNot(HaveOccurred())
+
+		request = out.Request{
 			Source: resource.Source{
 				API:           "https://api.run.pivotal.io",
 				Username:      "awesome@example.com",
@@ -51,6 +58,12 @@ var _ = Describe("Out", func() {
 				CurrentAppName: "awesome-app",
 			},
 		}
+	})
+
+	JustBeforeEach(func() {
+		assetsPath, err := filepath.Abs("assets")
+		Ω(err).ShouldNot(HaveOccurred())
+
 		stdin := &bytes.Buffer{}
 
 		err = json.NewEncoder(stdin).Encode(request)
@@ -75,36 +88,164 @@ var _ = Describe("Out", func() {
 	AfterEach(func() {
 		err := os.RemoveAll(tmpDir)
 		Ω(err).ShouldNot(HaveOccurred())
-
-		gexec.CleanupBuildArtifacts()
 	})
 
-	It("pushes an application to cloud foundry", func() {
-		session, err := gexec.Start(
-			cmd,
-			GinkgoWriter,
-			GinkgoWriter,
-		)
-		Ω(err).ShouldNot(HaveOccurred())
+	Context("when my manifest and file paths do not contain a glob", func() {
+		It("pushes an application to cloud foundry", func() {
+			session, err := gexec.Start(
+				cmd,
+				GinkgoWriter,
+				GinkgoWriter,
+			)
+			Ω(err).ShouldNot(HaveOccurred())
 
-		Eventually(session).Should(gexec.Exit(0))
+			Eventually(session).Should(gexec.Exit(0))
 
-		var response out.Response
-		err = json.Unmarshal(session.Out.Contents(), &response)
-		Ω(err).ShouldNot(HaveOccurred())
+			var response out.Response
+			err = json.Unmarshal(session.Out.Contents(), &response)
+			Ω(err).ShouldNot(HaveOccurred())
 
-		Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+			Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
 
-		// shim outputs arguments
-		Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
-		Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
-		Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-		Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
-			filepath.Join(tmpDir, "project/manifest.yml"),
-			filepath.Join(tmpDir, "another-project"),
-		))
+			// shim outputs arguments
+			Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
+			Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
+			Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
+			Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
+				filepath.Join(tmpDir, "project/manifest.yml"),
+				filepath.Join(tmpDir, "another-project"),
+			))
 
-		// color should be always
-		Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+			// color should be always
+			Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+		})
+	})
+
+	Context("when my manifest and file paths contain a glob", func() {
+		var tmpFileManifest *os.File
+		var tmpFileSearch *os.File
+
+		BeforeEach(func() {
+			var err error
+
+			tmpFileManifest, err = ioutil.TempFile(tmpDir, "manifest-some-glob.yml_")
+			Ω(err).ShouldNot(HaveOccurred())
+			tmpFileSearch, err = ioutil.TempFile(tmpDir, "another-path.jar_")
+			Ω(err).ShouldNot(HaveOccurred())
+
+			request.Params.ManifestPath = "manifest-*.yml_*"
+			request.Params.Path = "another-path.jar*"
+		})
+
+		Context("when one file matches", func() {
+			It("pushes an application to cloud foundry", func() {
+				session, err := gexec.Start(
+					cmd,
+					GinkgoWriter,
+					GinkgoWriter,
+				)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Eventually(session).Should(gexec.Exit(0))
+
+				var response out.Response
+				err = json.Unmarshal(session.Out.Contents(), &response)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+
+				// shim outputs arguments
+				Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
+				Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
+				Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
+				Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
+					tmpFileManifest.Name(),
+					tmpFileSearch.Name(),
+				))
+
+				// color should be always
+				Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+			})
+		})
+
+		Context("when no files match the manifest path", func() {
+			BeforeEach(func() {
+				request.Params.ManifestPath = "nope-*"
+			})
+
+			It("returns an error", func() {
+				session, err := gexec.Start(
+					cmd,
+					GinkgoWriter,
+					GinkgoWriter,
+				)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Eventually(session).Should(gexec.Exit(1))
+
+				errMsg := fmt.Sprintf("error invalid manifest path: found 0 files instead of 1 at path: %s", filepath.Join(tmpDir, `nope-\*`))
+				Ω(session.Err).Should(gbytes.Say(errMsg))
+			})
+		})
+
+		Context("when more then one file matches the manifest path", func() {
+			BeforeEach(func() {
+				_, err := ioutil.TempFile(tmpDir, "manifest-some-glob.yml_")
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				session, err := gexec.Start(
+					cmd,
+					GinkgoWriter,
+					GinkgoWriter,
+				)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Eventually(session).Should(gexec.Exit(1))
+				errMsg := fmt.Sprintf("error invalid manifest path: found 2 files instead of 1 at path: %s", filepath.Join(tmpDir, `manifest-\*.yml_\*`))
+				Ω(session.Err).Should(gbytes.Say(errMsg))
+			})
+		})
+
+		Context("when no files match the path", func() {
+			BeforeEach(func() {
+				request.Params.Path = "nope-*"
+			})
+
+			It("returns an error", func() {
+				session, err := gexec.Start(
+					cmd,
+					GinkgoWriter,
+					GinkgoWriter,
+				)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Eventually(session).Should(gexec.Exit(1))
+
+				errMsg := fmt.Sprintf("error invalid path: found 0 files instead of 1 at path: %s", filepath.Join(tmpDir, `nope-\*`))
+				Ω(session.Err).Should(gbytes.Say(errMsg))
+			})
+		})
+
+		Context("when more then one file matches the manifest path", func() {
+			BeforeEach(func() {
+				_, err := ioutil.TempFile(tmpDir, "another-path.jar_")
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+
+			It("returns an error", func() {
+				session, err := gexec.Start(
+					cmd,
+					GinkgoWriter,
+					GinkgoWriter,
+				)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Eventually(session).Should(gexec.Exit(1))
+				errMsg := fmt.Sprintf("error invalid path: found 2 files instead of 1 at path: %s", filepath.Join(tmpDir, `another-path.jar\*`))
+				Ω(session.Err).Should(gbytes.Say(errMsg))
+			})
+		})
 	})
 })
