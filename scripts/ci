@@ -31,13 +31,7 @@ BUILD_DIR=$PWD/built-resource
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
     export PATH=${PWD}/Godeps/_workspace/bin:$PATH
 
-    go build -o /tmp/autopilot github.com/concourse/autopilot
-)
-
-(
-    set -e
-
-    mv /tmp/autopilot $GOPATH/src/github.com/concourse/cf-resource
+    go build -o $BUILD_DIR/autopilot github.com/concourse/autopilot
 )
 
 (
@@ -48,16 +42,22 @@ BUILD_DIR=$PWD/built-resource
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
     export PATH=${PWD}/Godeps/_workspace/bin:$PATH
 
-    go build -o built-out ./out/cmd/out
-    go build -o built-check ./check/cmd/check
-    go build -o built-in ./in/cmd/in
+    go build -o $BUILD_DIR/built-out ./out/cmd/out
+    go build -o $BUILD_DIR/built-check ./check/cmd/check
+    go build -o $BUILD_DIR/built-in ./in/cmd/in
 )
 
 (
     set -e
 
     tar -xvf cf-cli/cf-linux-amd64.tgz
-    mv cf $GOPATH/src/github.com/concourse/cf-resource
+    mv cf $BUILD_DIR
 )
 
-cp cf autopilot built-{in,out,check} Dockerfile $BUILD_DIR
+(
+    set -e
+
+    cd $GOPATH/src/github.com/concourse/cf-resource
+
+    cp Dockerfile $BUILD_DIR
+)
