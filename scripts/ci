@@ -6,6 +6,8 @@ set -eu
 export GOPATH=$PWD/gopath
 export PATH=$GOPATH/bin:$PATH
 
+BUILD_DIR=$PWD/built-resource
+
 # run tests
 (
     set -e
@@ -58,3 +60,4 @@ export PATH=$GOPATH/bin:$PATH
     mv cf $GOPATH/src/github.com/concourse/cf-resource
 )
 
+cp cf autopilot built-{in,out,check} Dockerfile $BUILD_DIR

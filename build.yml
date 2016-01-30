@@ -3,11 +3,14 @@ platform: linux
 image: docker:///concourse/static-golang
 
 inputs:
-  - name: cf-resource
-    path: gopath/src/github.com/concourse/cf-resource
-  - name: autopilot
-    path: gopath/src/github.com/concourse/autopilot
-  - name: cf-cli
+- name: cf-resource
+  path: gopath/src/github.com/concourse/cf-resource
+- name: autopilot
+  path: gopath/src/github.com/concourse/autopilot
+- name: cf-cli
+
+outputs:
+- name: built-resource
 
 run:
   path: gopath/src/github.com/concourse/cf-resource/scripts/ci
