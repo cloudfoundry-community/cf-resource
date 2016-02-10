@@ -45,7 +45,7 @@ jobs:
   - get: resource-web-app
   - task: build
     file: resource-web-app/build.yml
-  - put: pws
+  - put: resource-deploy-web-app
     params:
       manifest: build-output/manifest.yml
       path: build-output/binary
@@ -59,7 +59,7 @@ resources:
   source:
     uri: https://github.com/cloudfoundry-community/simple-go-web-app.git
 
-- name: pws
+- name: resource-deploy-web-app
   type: cf
   source:
     api: https://api.run.pivotal.io
