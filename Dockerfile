@@ -1,11 +1,7 @@
-FROM progrium/busybox
-
-RUN opkg-install ca-certificates
+FROM concourse/busyboxplus:base
 
 # satisfy go crypto/x509
-RUN for cert in `ls -1 /etc/ssl/certs/*.crt | grep -v /etc/ssl/certs/ca-certificates.crt`; \
-      do cat "$cert" >> /etc/ssl/certs/ca-certificates.crt; \
-    done
+RUN cat /etc/ssl/certs/*.pem > /etc/ssl/certs/ca-certificates.crt
 
 ADD cf /usr/bin/cf
 ADD autopilot /usr/bin/autopilot
