@@ -43,10 +43,11 @@ jobs:
   serial: true
   plan:
   - get: resource-web-app
+  - task: build
+    file: resource-web-app/build.yml
   - put: resource-deploy-web-app
     params:
-      manifest: resource-web-app/manifest.yml
-      path: resource-web-app
+      manifest: build-output/manifest.yml
       environment_variables:
         key: value
         key2: value2
