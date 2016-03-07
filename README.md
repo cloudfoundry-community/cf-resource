@@ -48,7 +48,6 @@ jobs:
   - put: resource-deploy-web-app
     params:
       manifest: build-output/manifest.yml
-      path: build-output/binary
       environment_variables:
         key: value
         key2: value2
