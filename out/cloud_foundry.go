@@ -45,10 +45,33 @@ func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName str
 	}
 
 	if path != "" {
+		stat, err := os.Stat(path)
+		if err != nil {
+			return err
+		}
+		if stat.IsDir() {
+			return chdir(path, cf.cf(args...).Run)
+		}
+
+		// path is a zip file, add it to the args
 		args = append(args, "-p", path)
 	}
 
 	return cf.cf(args...).Run()
+}
+
+func chdir(path string, f func() error) error {
+	oldpath, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	err = os.Chdir(path)
+	if err != nil {
+		return err
+	}
+	err = f()
+	os.Chdir(oldpath)
+	return err
 }
 
 func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {

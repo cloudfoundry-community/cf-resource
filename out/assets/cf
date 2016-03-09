@@ -1,5 +1,5 @@
 #!/bin/bash
 
-echo $(basename $0) $*
+echo $PWD $(basename $0) $*
 echo
 env

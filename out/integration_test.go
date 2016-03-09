@@ -40,7 +40,7 @@ var _ = Describe("Out", func() {
 		err = ioutil.WriteFile(filepath.Join(tmpDir, "project", "manifest.yml"), []byte{}, 0555)
 		Ω(err).ShouldNot(HaveOccurred())
 
-		err = ioutil.WriteFile(filepath.Join(tmpDir, "another-project"), []byte{}, 0555)
+		err = os.Mkdir(filepath.Join(tmpDir, "another-project"), 0555)
 		Ω(err).ShouldNot(HaveOccurred())
 
 		request = out.Request{
@@ -90,7 +90,7 @@ var _ = Describe("Out", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 	})
 
-	Context("when my manifest and file paths do not contain a glob", func() {
+	Context("when my manifest and paths do not contain a glob", func() {
 		It("pushes an application to cloud foundry", func() {
 			session, err := gexec.Start(
 				cmd,
@@ -111,9 +111,9 @@ var _ = Describe("Out", func() {
 			Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 			Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
 			Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-			Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
-				filepath.Join(tmpDir, "project/manifest.yml"),
+			Ω(session.Err).Should(gbytes.Say("%s cf zero-downtime-push awesome-app -f %s",
 				filepath.Join(tmpDir, "another-project"),
+				filepath.Join(tmpDir, "project/manifest.yml"),
 			))
 
 			// color should be always
