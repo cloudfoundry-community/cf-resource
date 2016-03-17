@@ -69,9 +69,9 @@ func chdir(path string, f func() error) error {
 	if err != nil {
 		return err
 	}
-	err = f()
-	os.Chdir(oldpath)
-	return err
+	defer os.Chdir(oldpath)
+
+	return f()
 }
 
 func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {

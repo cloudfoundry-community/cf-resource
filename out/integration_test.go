@@ -111,10 +111,10 @@ var _ = Describe("Out", func() {
 			Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 			Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
 			Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-			Ω(session.Err).Should(gbytes.Say("%s cf zero-downtime-push awesome-app -f %s",
-				filepath.Join(tmpDir, "another-project"),
+			Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s",
 				filepath.Join(tmpDir, "project/manifest.yml"),
 			))
+			Ω(session.Err).Should(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 			// color should be always
 			Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
