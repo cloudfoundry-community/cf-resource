@@ -50,7 +50,7 @@ BUILD_DIR=$PWD/built-resource
 (
     set -e
 
-    tar -xvf cf-cli/cf-linux-amd64.tgz
+    tar -xvf cf-cli/cf-cli_*_linux_x86-64.tgz
     mv cf $BUILD_DIR
 )
 
