@@ -26,12 +26,12 @@ BUILD_DIR=$PWD/built-resource
 (
     set -e
 
-    cd $GOPATH/src/github.com/concourse/autopilot
+    cd $GOPATH/src/github.com/contraband/autopilot
 
     export GOPATH=${PWD}/Godeps/_workspace:$GOPATH
     export PATH=${PWD}/Godeps/_workspace/bin:$PATH
 
-    go build -o $BUILD_DIR/autopilot github.com/concourse/autopilot
+    go build -o $BUILD_DIR/autopilot github.com/contraband/autopilot
 )
 
 (

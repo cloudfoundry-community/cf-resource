@@ -9,7 +9,7 @@ inputs:
 - name: cf-resource
   path: gopath/src/github.com/concourse/cf-resource
 - name: autopilot
-  path: gopath/src/github.com/concourse/autopilot
+  path: gopath/src/github.com/contraband/autopilot
 - name: cf-cli
 
 outputs:
