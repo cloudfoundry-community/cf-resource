@@ -57,6 +57,12 @@ BUILD_DIR=$PWD/built-resource
 (
     set -e
 
+    mv antifreeze/antifreeze-linux $BUILD_DIR/antifreeze
+)
+
+(
+    set -e
+
     cd $GOPATH/src/github.com/concourse/cf-resource
 
     cp Dockerfile $BUILD_DIR
