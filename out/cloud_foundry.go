@@ -39,7 +39,7 @@ func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName str
 	zeroDowntimeDeploy := currentAppName != ""
 
 	if zeroDowntimeDeploy {
-		err := cf.cf("check-manifest", currentAppName, "-f ", manifest).Run()
+		err := cf.cf("check-manifest", currentAppName, "-f", manifest).Run()
 		if err != nil {
 			return err
 		}
