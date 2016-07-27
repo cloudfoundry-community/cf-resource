@@ -41,6 +41,136 @@ var _ = Describe("Out Command", func() {
 	})
 
 	Describe("running the command", func() {
+		Context("with organization and space only set via params", func() {
+			var (
+				requestOverwrite out.Request
+			)
+
+			BeforeEach(func() {
+				requestOverwrite = out.Request{
+					Source: resource.Source{
+						API:      "https://api.run.pivotal.io",
+						Username: "awesome@example.com",
+						Password: "hunter2",
+					},
+					Params: out.Params{
+						ManifestPath: "assets/manifest.yml",
+						Organization: "new-secret",
+						Space:        "sky-base",
+					},
+				}
+			})
+
+			It("pushes an application into cloud foundry", func() {
+				response, err := command.Run(requestOverwrite)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+				Ω(response.Metadata[0]).Should(Equal(
+					resource.MetadataPair{
+						Name:  "organization",
+						Value: "new-secret",
+					},
+				))
+				Ω(response.Metadata[1]).Should(Equal(
+					resource.MetadataPair{
+						Name:  "space",
+						Value: "sky-base",
+					},
+				))
+
+				By("logging in")
+				Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))
+
+				api, username, password, insecure := cloudFoundry.LoginArgsForCall(0)
+				Ω(api).Should(Equal("https://api.run.pivotal.io"))
+				Ω(username).Should(Equal("awesome@example.com"))
+				Ω(password).Should(Equal("hunter2"))
+				Ω(insecure).Should(Equal(false))
+
+				By("targetting the organization and space")
+				Ω(cloudFoundry.TargetCallCount()).Should(Equal(1))
+
+				org, space := cloudFoundry.TargetArgsForCall(0)
+				Ω(org).Should(Equal("new-secret"))
+				Ω(space).Should(Equal("sky-base"))
+
+				By("pushing the app")
+				Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
+
+				manifest, path, currentAppName := cloudFoundry.PushAppArgsForCall(0)
+				Ω(manifest).Should(Equal("assets/manifest.yml"))
+				Ω(path).Should(Equal(""))
+				Ω(currentAppName).Should(Equal(""))
+			})
+		})
+
+		Context("with overwriting organization and space with params", func() {
+			var (
+				requestOverwrite out.Request
+			)
+
+			BeforeEach(func() {
+				requestOverwrite = out.Request{
+					Source: resource.Source{
+						API:          "https://api.run.pivotal.io",
+						Username:     "awesome@example.com",
+						Password:     "hunter2",
+						Organization: "secret",
+						Space:        "volcano-base",
+					},
+					Params: out.Params{
+						ManifestPath: "assets/manifest.yml",
+						Organization: "new-secret",
+						Space:        "sky-base",
+					},
+				}
+			})
+
+			It("pushes an application into cloud foundry", func() {
+				response, err := command.Run(requestOverwrite)
+				Ω(err).ShouldNot(HaveOccurred())
+
+				Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+				Ω(response.Metadata[0]).Should(Equal(
+					resource.MetadataPair{
+						Name:  "organization",
+						Value: "new-secret",
+					},
+				))
+				Ω(response.Metadata[1]).Should(Equal(
+					resource.MetadataPair{
+						Name:  "space",
+						Value: "sky-base",
+					},
+				))
+
+				By("logging in")
+				Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))
+
+				api, username, password, insecure := cloudFoundry.LoginArgsForCall(0)
+				Ω(api).Should(Equal("https://api.run.pivotal.io"))
+				Ω(username).Should(Equal("awesome@example.com"))
+				Ω(password).Should(Equal("hunter2"))
+				Ω(insecure).Should(Equal(false))
+
+				By("targetting the organization and space")
+				Ω(cloudFoundry.TargetCallCount()).Should(Equal(1))
+
+				org, space := cloudFoundry.TargetArgsForCall(0)
+				Ω(org).Should(Equal("new-secret"))
+				Ω(space).Should(Equal("sky-base"))
+
+				By("pushing the app")
+				Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
+
+				manifest, path, currentAppName := cloudFoundry.PushAppArgsForCall(0)
+				Ω(manifest).Should(Equal("assets/manifest.yml"))
+				Ω(path).Should(Equal(""))
+				Ω(currentAppName).Should(Equal(""))
+			})
+		})
+
 		It("pushes an application into cloud foundry", func() {
 			response, err := command.Run(request)
 			Ω(err).ShouldNot(HaveOccurred())
