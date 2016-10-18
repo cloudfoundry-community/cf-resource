@@ -8,10 +8,11 @@ type Request struct {
 }
 
 type Params struct {
-	ManifestPath         string            `json:"manifest"`
-	Path                 string            `json:"path"`
-	CurrentAppName       string            `json:"current_app_name"`
-	EnvironmentVariables map[string]string `json:"environment_variables"`
+	ManifestPath                 string            `json:"manifest"`
+	Path                         string            `json:"path"`
+	CurrentAppName               string            `json:"current_app_name"`
+	EnvironmentVariables         map[string]string `json:"environment_variables"`
+	EnvironmentVariablesFromFile map[string]string `json:"environment_variables_from_files"`
 }
 
 type Response struct {
