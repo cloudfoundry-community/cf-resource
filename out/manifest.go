@@ -24,6 +24,15 @@ func NewManifest(manifestPath string) (Manifest, error) {
 	return manifest, nil
 }
 
+func (manifest *Manifest) AppName() string {
+	name, _ := manifest.data["name"].(string)
+	return name
+}
+
+func (manifest *Manifest) SetAppName(name string) {
+	manifest.data["name"] = name
+}
+
 func (manifest *Manifest) EnvironmentVariables() map[interface{}]interface{} {
 	envVars, hasEnvVars := manifest.data["env"].(map[interface{}]interface{})
 	if !hasEnvVars {

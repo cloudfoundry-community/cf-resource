@@ -32,6 +32,8 @@ be specified.
 * `current_app_name`: *Optional.* This should be the name of the application
   that this will re-deploy over. If this is set the resource will perform a
   zero-downtime deploy.
+* `new_app_name`: *Optional.* This is the name of the app in cloud foundry. 
+  It will override the `name` value in the manifest file.
 
 ## Pipeline example
 
@@ -48,6 +50,7 @@ jobs:
   - put: resource-deploy-web-app
     params:
       manifest: build-output/manifest.yml
+      new_app_name: job-deploy-app-test
       environment_variables:
         key: value
         key2: value2

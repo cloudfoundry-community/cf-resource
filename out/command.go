@@ -35,7 +35,7 @@ func (command *Command) Run(request Request) (Response, error) {
 		return Response{}, err
 	}
 
-	if err := command.setEnvironmentVariables(request); err != nil {
+	if err := command.updateManifestFile(request); err != nil {
 		return Response{}, err
 	}
 
@@ -65,8 +65,8 @@ func (command *Command) Run(request Request) (Response, error) {
 	}, nil
 }
 
-func (command *Command) setEnvironmentVariables(request Request) error {
-	if len(request.Params.EnvironmentVariables) == 0 {
+func (command *Command) updateManifestFile(request Request) error {
+	if request.Params.NewAppName == "" && len(request.Params.EnvironmentVariables) == 0 {
 		return nil
 	}
 
@@ -75,12 +75,16 @@ func (command *Command) setEnvironmentVariables(request Request) error {
 		return err
 	}
 
+	if request.Params.NewAppName != "" {
+		manifest.SetAppName(request.Params.NewAppName)
+	}
+
 	for key, value := range request.Params.EnvironmentVariables {
 		manifest.AddEnvironmentVariable(key, value)
 	}
 
 	err = manifest.Save(request.Params.ManifestPath)
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 

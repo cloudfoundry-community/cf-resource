@@ -28,6 +28,11 @@ var _ = Describe("Manifest", func() {
 			Ω(envVars["MANIFEST_B"]).Should(Equal("manifest_b"))
 		})
 
+		It("can extract the service name", func() {
+			name := manifest.AppName()
+			Ω(name).Should(Equal("service_a"))
+		})
+
 		Context("when updated", func() {
 			var tempFile *os.File
 
@@ -40,11 +45,13 @@ var _ = Describe("Manifest", func() {
 				Ω(err).ShouldNot(HaveOccurred())
 
 				manifest.AddEnvironmentVariable("MANIFEST_TEST_A", "manifest_test_a")
+				manifest.SetAppName("my_new_app_name")
 				err = manifest.Save(tempFile.Name())
 				Ω(err).ShouldNot(HaveOccurred())
 
 				updatedManifest, err := out.NewManifest(tempFile.Name())
 				Ω(err).ShouldNot(HaveOccurred())
+				Ω(updatedManifest.AppName()).Should(Equal("my_new_app_name"))
 				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_A"]).Should(Equal("manifest_a"))
 				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_B"]).Should(Equal("manifest_b"))
 				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_TEST_A"]).Should(Equal("manifest_test_a"))
