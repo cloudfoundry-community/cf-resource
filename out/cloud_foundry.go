@@ -36,12 +36,21 @@ func (cf *CloudFoundry) Target(organization string, space string) error {
 }
 
 func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName string) error {
+	zeroDowntimeDeploy := currentAppName != ""
+
+	if zeroDowntimeDeploy {
+		err := cf.cf("check-manifest", currentAppName, "-f", manifest).Run()
+		if err != nil {
+			return err
+		}
+	}
+
 	args := []string{}
 
-	if currentAppName == "" {
-		args = append(args, "push", "-f", manifest)
-	} else {
+	if zeroDowntimeDeploy {
 		args = append(args, "zero-downtime-push", currentAppName, "-f", manifest)
+	} else {
+		args = append(args, "push", "-f", manifest)
 	}
 
 	if path != "" {
