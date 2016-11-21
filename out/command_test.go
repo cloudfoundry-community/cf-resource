@@ -173,6 +173,59 @@ var _ = Describe("Out Command", func() {
 			})
 		})
 
+		Context("setting service name provided in params", func() {
+			var err error
+			var tempFile *os.File
+
+			BeforeEach(func() {
+				sourceFile, err := os.Open("assets/manifest.yml")
+				Ω(err).ShouldNot(HaveOccurred())
+				defer sourceFile.Close()
+
+				tempFile, err = ioutil.TempFile("assets", "command_test.yml_")
+				Ω(err).ShouldNot(HaveOccurred())
+				defer tempFile.Close()
+
+				_, err = io.Copy(tempFile, sourceFile)
+
+				request = out.Request{
+					Source: resource.Source{
+						API:          "https://api.run.pivotal.io",
+						Username:     "awesome@example.com",
+						Password:     "hunter2",
+						Organization: "secret",
+						Space:        "volcano-base",
+					},
+					Params: out.Params{
+						ManifestPath: tempFile.Name(),
+						NewAppName:   "my_new_app_name",
+					},
+				}
+				_, err = command.Run(request)
+			})
+
+			AfterEach(func() {
+				os.Remove(tempFile.Name())
+			})
+
+			It("does not raise an error", func() {
+				Ω(err).ShouldNot(HaveOccurred())
+			})
+
+			It("writes the service name into the manifest", func() {
+				manifest, _ := out.NewManifest(request.Params.ManifestPath)
+				Ω(manifest.AppName()).Should(Equal("my_new_app_name"))
+			})
+		})
+
+		Context("no service name provided", func() {
+			It("doesn't set the service name", func() {
+				manifest, err := out.NewManifest(request.Params.ManifestPath)
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(manifest.AppName()).Should(Equal("service_a"))
+			})
+		})
+
 		It("lets people skip the certificate check", func() {
 			request = out.Request{
 				Source: resource.Source{
