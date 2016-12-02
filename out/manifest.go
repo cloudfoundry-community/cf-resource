@@ -38,6 +38,16 @@ func (manifest *Manifest) AddEnvironmentVariable(name, value string) {
 	manifest.EnvironmentVariables()[name] = value
 }
 
+func (manifest *Manifest) AddEnvironmentVariableFromFile(name string, filePath string) {
+
+	envVar, err := ioutil.ReadFile(filePath)
+	if err != nil || len(envVar) <= 0 {
+		return
+	}
+
+	manifest.EnvironmentVariables()[name] = string(envVar[:])
+}
+
 func (manifest *Manifest) Save(manifestPath string) error {
 	data, err := yaml.Marshal(manifest.data)
 	if err != nil {

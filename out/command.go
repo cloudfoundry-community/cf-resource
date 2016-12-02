@@ -79,8 +79,11 @@ func (command *Command) setEnvironmentVariables(request Request) error {
 		manifest.AddEnvironmentVariable(key, value)
 	}
 
+	for key, value := range request.Params.EnvironmentVariablesFromFile {
+		manifest.AddEnvironmentVariableFromFile(key, value)
+	}
 	err = manifest.Save(request.Params.ManifestPath)
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 

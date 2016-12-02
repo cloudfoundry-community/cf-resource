@@ -30,14 +30,21 @@ var _ = Describe("Manifest", func() {
 
 		Context("when updated", func() {
 			var tempFile *os.File
-
+			var tempFileVar *os.File
 			AfterEach(func() {
 				os.Remove(tempFile.Name())
+				os.Remove(tempFileVar.Name())
 			})
 
 			It("can write out a modified manifest", func() {
 				tempFile, err = ioutil.TempFile("assets", "manifest_test.yml_")
 				Ω(err).ShouldNot(HaveOccurred())
+
+				tempFileVar, err = ioutil.TempFile("assets", "var_env_file")
+				Ω(err).ShouldNot(HaveOccurred())
+				err = ioutil.WriteFile(tempFileVar.Name(), []byte(string("VAR-VALUE-INSIDE-FILE")), os.FileMode(int(0755)))
+				Ω(err).ShouldNot(HaveOccurred())
+				manifest.AddEnvironmentVariableFromFile("ENV_FROM_FILE", tempFileVar.Name())
 
 				manifest.AddEnvironmentVariable("MANIFEST_TEST_A", "manifest_test_a")
 				err = manifest.Save(tempFile.Name())
@@ -48,6 +55,7 @@ var _ = Describe("Manifest", func() {
 				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_A"]).Should(Equal("manifest_a"))
 				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_B"]).Should(Equal("manifest_b"))
 				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_TEST_A"]).Should(Equal("manifest_test_a"))
+				Ω(updatedManifest.EnvironmentVariables()["ENV_FROM_FILE"]).Should(Equal("VAR-VALUE-INSIDE-FILE"))
 			})
 		})
 	})

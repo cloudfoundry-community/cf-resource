@@ -32,6 +32,8 @@ be specified.
 * `current_app_name`: *Optional.* This should be the name of the application
   that this will re-deploy over. If this is set the resource will perform a
   zero-downtime deploy.
+* `environment_variables:`: *Optional.* Add environment variables to your application deployment 
+* `environment_variables_from_files`: *Optional.* Add environment variable to your application deployment trought files. This allow to share from previous step and so on.
 
 ## Pipeline example
 
@@ -51,6 +53,9 @@ jobs:
       environment_variables:
         key: value
         key2: value2
+      environment_variables_from_files:
+        ABC: ./path/to/a
+        VERSION: ./version/number
 
 resources:
 - name: resource-web-app
