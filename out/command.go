@@ -27,9 +27,19 @@ func (command *Command) Run(request Request) (Response, error) {
 		return Response{}, err
 	}
 
+	organization := request.Source.Organization
+	space := request.Source.Space
+	if request.Params.Organization != "" {
+		organization = request.Params.Organization
+	}
+
+	if request.Params.Space != "" {
+		space = request.Params.Space
+	}
+
 	err = command.paas.Target(
-		request.Source.Organization,
-		request.Source.Space,
+		organization,
+		space,
 	)
 	if err != nil {
 		return Response{}, err
@@ -55,11 +65,11 @@ func (command *Command) Run(request Request) (Response, error) {
 		Metadata: []resource.MetadataPair{
 			{
 				Name:  "organization",
-				Value: request.Source.Organization,
+				Value: organization,
 			},
 			{
 				Name:  "space",
-				Value: request.Source.Space,
+				Value: space,
 			},
 		},
 	}, nil
@@ -80,7 +90,7 @@ func (command *Command) setEnvironmentVariables(request Request) error {
 	}
 
 	err = manifest.Save(request.Params.ManifestPath)
-	if (err != nil) {
+	if err != nil {
 		return err
 	}
 
