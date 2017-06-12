@@ -91,6 +91,13 @@ var _ = Describe("Out", func() {
 	})
 
 	Context("when my manifest and paths do not contain a glob", func() {
+		BeforeEach(func() {
+			request.Source.CommandEnvironmentVariables = map[string]interface{}{
+				"COMMAND_ENV_ONE": "command_env_one",
+				"COMMAND_ENV_TWO": "command_env_two",
+			}
+		})
+
 		It("pushes an application to cloud foundry", func() {
 			session, err := gexec.Start(
 				cmd,
@@ -118,6 +125,9 @@ var _ = Describe("Out", func() {
 
 			// color should be always
 			Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+			// order is important because `env | sort` as Say fast forwards
+			Ω(session.Err).Should(gbytes.Say("COMMAND_ENV_ONE=command_env_one"))
+			Ω(session.Err).Should(gbytes.Say("COMMAND_ENV_TWO=command_env_two"))
 		})
 	})
 

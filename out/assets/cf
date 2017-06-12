@@ -4,4 +4,6 @@ echo $(basename $0) $*
 echo
 echo $PWD
 echo
-env
+# env order needs to be predictable for testing as `gbytes.Say`
+# in `integration_test` fast forwards through buffer contents
+env | sort
