@@ -19,7 +19,7 @@ var _ = BeforeSuite(func() {
 	var err error
 
 	binPath, err = gexec.Build("github.com/concourse/cf-resource/out/cmd/out")
-	Ω(err).ShouldNot(HaveOccurred())
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {
