@@ -1,6 +1,7 @@
 package out
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 )
@@ -12,11 +13,12 @@ type PAAS interface {
 }
 
 type CloudFoundry struct {
-	cfEnvironment *CfEnvironment
+	ConfiguredEnvironment map[string]interface{}
+	OsEnvironment         []string
 }
 
-func NewCloudFoundry() *CloudFoundry {
-	return &CloudFoundry{NewCfEnvironmentFromOS()}
+func NewCloudFoundry(configuredEnvironment map[string]interface{}, osEnvironment []string) *CloudFoundry {
+	return &CloudFoundry{configuredEnvironment, osEnvironment}
 }
 
 func (cf *CloudFoundry) Login(api string, username string, password string, insecure bool) error {
@@ -76,19 +78,16 @@ func chdir(path string, f func() error) error {
 	return f()
 }
 
-func (cf *CloudFoundry) CommandEnvironment() *CfEnvironment {
-	return cf.cfEnvironment
-}
-
-func (cf *CloudFoundry) AddEnvironmentVariable(switchMap map[string]interface{}) {
-	cf.cfEnvironment.AddEnvironmentVariable(switchMap)
-}
-
 func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd := exec.Command("cf", args...)
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
-	cmd.Env = cf.cfEnvironment.Environment()
+
+	environment := cf.OsEnvironment
+	for k, v := range cf.ConfiguredEnvironment {
+		environment = append(environment, fmt.Sprintf("%s=%v", k, v))
+	}
+	cmd.Env = environment
 
 	return cmd
 }
