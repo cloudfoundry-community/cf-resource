@@ -1,9 +1,9 @@
 package out
 
 import (
-	"strings"
-	"os"
 	"fmt"
+	"os"
+	"strings"
 )
 
 type CfEnvironment struct {
@@ -12,7 +12,7 @@ type CfEnvironment struct {
 
 func NewCfEnvironment() *CfEnvironment {
 	env := make(map[string]string)
-	env["CF_COLOR"]="true"
+	env["CF_COLOR"] = "true"
 
 	cfe := &CfEnvironment{env}
 
@@ -37,13 +37,12 @@ func SplitKeyValueStringArrayInToMap(data []string) map[string]interface{} {
 	return items
 }
 
-func SplitKeyValueString(item string)(key, val string) {
+func SplitKeyValueString(item string) (key, val string) {
 	splits := strings.SplitN(item, "=", 2)
 	key = splits[0]
 	val = splits[1]
 	return
 }
-
 
 func (cfe *CfEnvironment) addEnvironmentVariable(key, value string) {
 	cfe.env[key] = value
