@@ -34,24 +34,24 @@ var _ = Describe("utility functions", func() {
 		It("simple k=v string splits correctly", func() {
 			key, value := out.SplitKeyValueString(simpleKVString)
 
-			Ω(key).Should(Equal("SIMPLE"))
-			Ω(value).Should(Equal("pair"))
+			Expect(key).To(Equal("SIMPLE"))
+			Expect(value).To(Equal("pair"))
 		})
 
 		It("value containing equal is parsed correctly (needs `SplitN()`)", func() {
 			key, value := out.SplitKeyValueString(keyWithValueContainingEqualsString)
 
-			Ω(key).Should(Equal("EQUAL_VALUE"))
-			Ω(value).Should(Equal("val_key=val_val"))
+			Expect(key).To(Equal("EQUAL_VALUE"))
+			Expect(value).To(Equal("val_key=val_val"))
 		})
 
 		It("array of k=v strings split correctly in to map", func() {
 			kvMap := out.SplitKeyValueStringArrayInToMap(osLikeKVArray)
 
-			Ω(kvMap).Should(HaveLen(3))
-			Ω(kvMap).Should(HaveKeyWithValue("OS_ONE", "one"))
-			Ω(kvMap).Should(HaveKeyWithValue("OS_TWO", "two"))
-			Ω(kvMap).Should(HaveKeyWithValue("OS_THREE", "three"))
+			Expect(kvMap).To(HaveLen(3))
+			Expect(kvMap).To(HaveKeyWithValue("OS_ONE", "one"))
+			Expect(kvMap).To(HaveKeyWithValue("OS_TWO", "two"))
+			Expect(kvMap).To(HaveKeyWithValue("OS_THREE", "three"))
 		})
 	})
 })
@@ -66,8 +66,8 @@ var _ = Describe("CfEnvironment from Empty", func() {
 
 		It("default command environment should ONLY contain CF_COLOR=true", func() {
 			cfEnv := cfEnvironment.Environment()
-			Ω(cfEnv).Should(HaveLen(1))
-			Ω(cfEnv).Should(ContainElement("CF_COLOR=true"))
+			Expect(cfEnv).To(HaveLen(1))
+			Expect(cfEnv).To(ContainElement("CF_COLOR=true"))
 		})
 
 		It("added environment switch ends up in environment", func() {
@@ -75,8 +75,8 @@ var _ = Describe("CfEnvironment from Empty", func() {
 			cfEnvironment.AddEnvironmentVariable(oneEnvironmentPair)
 			cfEnv := cfEnvironment.Environment()
 
-			Ω(cfEnv).Should(HaveLen(2))
-			Ω(cfEnv).Should(ContainElement("ENV_ONE=env_one"))
+			Expect(cfEnv).To(HaveLen(2))
+			Expect(cfEnv).To(ContainElement("ENV_ONE=env_one"))
 		})
 
 		It("multiple environment switches all end up in environment", func() {
@@ -84,10 +84,10 @@ var _ = Describe("CfEnvironment from Empty", func() {
 			cfEnvironment.AddEnvironmentVariable(multipleEnvironmentPairs)
 			cfEnv := cfEnvironment.Environment()
 
-			Ω(cfEnv).Should(HaveLen(4))
-			Ω(cfEnv).Should(ContainElement("ENV_ONE=env_one"))
-			Ω(cfEnv).Should(ContainElement("ENV_TWO=2"))
-			Ω(cfEnv).Should(ContainElement("ENV_THREE=true"))
+			Expect(cfEnv).To(HaveLen(4))
+			Expect(cfEnv).To(ContainElement("ENV_ONE=env_one"))
+			Expect(cfEnv).To(ContainElement("ENV_TWO=2"))
+			Expect(cfEnv).To(ContainElement("ENV_THREE=true"))
 		})
 
 		It("multiple adds to environment retains all additions", func() {
@@ -95,12 +95,12 @@ var _ = Describe("CfEnvironment from Empty", func() {
 			cfEnvironment.AddEnvironmentVariable(fiveEnvironmentPair)
 			cfEnv := cfEnvironment.Environment()
 
-			Ω(cfEnv).Should(HaveLen(5))
-			Ω(cfEnv).Should(ContainElement("ENV_ONE=env_one"))
-			Ω(cfEnv).Should(ContainElement("ENV_TWO=2"))
-			Ω(cfEnv).Should(ContainElement("ENV_THREE=true"))
+			Expect(cfEnv).To(HaveLen(5))
+			Expect(cfEnv).To(ContainElement("ENV_ONE=env_one"))
+			Expect(cfEnv).To(ContainElement("ENV_TWO=2"))
+			Expect(cfEnv).To(ContainElement("ENV_THREE=true"))
 
-			Ω(cfEnv).Should(ContainElement("ENV_FIVE=env_five"))
+			Expect(cfEnv).To(ContainElement("ENV_FIVE=env_five"))
 		})
 
 	})
@@ -118,8 +118,8 @@ var _ = Describe("CfEnvironment from OS", func() {
 
 		It("default command environment should contain CF_COLOR=true", func() {
 			cfEnv := cfEnvironment.Environment()
-			Ω(cfEnv).Should(HaveLen(baseExpectedEnvVariables))
-			Ω(cfEnv).Should(ContainElement("CF_COLOR=true"))
+			Expect(cfEnv).To(HaveLen(baseExpectedEnvVariables))
+			Expect(cfEnv).To(ContainElement("CF_COLOR=true"))
 		})
 	})
 })

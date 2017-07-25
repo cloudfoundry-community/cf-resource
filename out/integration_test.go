@@ -32,16 +32,16 @@ var _ = Describe("Out", func() {
 		var err error
 
 		tmpDir, err = ioutil.TempDir("", "cf_resource_out")
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		err = os.Mkdir(filepath.Join(tmpDir, "project"), 0755)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		err = ioutil.WriteFile(filepath.Join(tmpDir, "project", "manifest.yml"), []byte{}, 0555)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		err = os.Mkdir(filepath.Join(tmpDir, "another-project"), 0555)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		request = out.Request{
 			Source: resource.Source{
@@ -62,12 +62,12 @@ var _ = Describe("Out", func() {
 
 	JustBeforeEach(func() {
 		assetsPath, err := filepath.Abs("assets")
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		stdin := &bytes.Buffer{}
 
 		err = json.NewEncoder(stdin).Encode(request)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 
 		cmd = exec.Command(binPath, tmpDir)
 		cmd.Stdin = stdin
@@ -87,7 +87,7 @@ var _ = Describe("Out", func() {
 
 	AfterEach(func() {
 		err := os.RemoveAll(tmpDir)
-		Ω(err).ShouldNot(HaveOccurred())
+		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Context("when my manifest and paths do not contain a glob", func() {
@@ -104,30 +104,30 @@ var _ = Describe("Out", func() {
 				GinkgoWriter,
 				GinkgoWriter,
 			)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			Eventually(session).Should(gexec.Exit(0))
 
 			var response out.Response
 			err = json.Unmarshal(session.Out.Contents(), &response)
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
-			Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+			Expect(response.Version.Timestamp).To(BeTemporally("~", time.Now(), time.Second))
 
 			// shim outputs arguments
-			Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
-			Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
-			Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-			Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s",
+			Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
+			Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
+			Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
+			Expect(session.Err).To(gbytes.Say("cf zero-downtime-push awesome-app -f %s",
 				filepath.Join(tmpDir, "project/manifest.yml"),
 			))
-			Ω(session.Err).Should(gbytes.Say(filepath.Join(tmpDir, "another-project")))
+			Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 			// color should be always
-			Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+			Expect(session.Err).To(gbytes.Say("CF_COLOR=true"))
 			// order is important because `env | sort` as Say fast forwards
-			Ω(session.Err).Should(gbytes.Say("COMMAND_ENV_ONE=command_env_one"))
-			Ω(session.Err).Should(gbytes.Say("COMMAND_ENV_TWO=command_env_two"))
+			Expect(session.Err).To(gbytes.Say("COMMAND_ENV_ONE=command_env_one"))
+			Expect(session.Err).To(gbytes.Say("COMMAND_ENV_TWO=command_env_two"))
 		})
 	})
 
@@ -139,9 +139,9 @@ var _ = Describe("Out", func() {
 			var err error
 
 			tmpFileManifest, err = ioutil.TempFile(tmpDir, "manifest-some-glob.yml_")
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 			tmpFileSearch, err = ioutil.TempFile(tmpDir, "another-path.jar_")
-			Ω(err).ShouldNot(HaveOccurred())
+			Expect(err).NotTo(HaveOccurred())
 
 			request.Params.ManifestPath = "manifest-*.yml_*"
 			request.Params.Path = "another-path.jar*"
@@ -154,27 +154,27 @@ var _ = Describe("Out", func() {
 					GinkgoWriter,
 					GinkgoWriter,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(session).Should(gexec.Exit(0))
 
 				var response out.Response
 				err = json.Unmarshal(session.Out.Contents(), &response)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
-				Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+				Expect(response.Version.Timestamp).To(BeTemporally("~", time.Now(), time.Second))
 
 				// shim outputs arguments
-				Ω(session.Err).Should(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
-				Ω(session.Err).Should(gbytes.Say("cf auth awesome@example.com hunter2"))
-				Ω(session.Err).Should(gbytes.Say("cf target -o org -s space"))
-				Ω(session.Err).Should(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
+				Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
+				Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
+				Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
+				Expect(session.Err).To(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
 					tmpFileManifest.Name(),
 					tmpFileSearch.Name(),
 				))
 
 				// color should be always
-				Ω(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+				Expect(session.Err).To(gbytes.Say("CF_COLOR=true"))
 			})
 		})
 
@@ -189,19 +189,19 @@ var _ = Describe("Out", func() {
 					GinkgoWriter,
 					GinkgoWriter,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(session).Should(gexec.Exit(1))
 
 				errMsg := fmt.Sprintf("error invalid manifest path: found 0 files instead of 1 at path: %s", filepath.Join(tmpDir, `nope-\*`))
-				Ω(session.Err).Should(gbytes.Say(errMsg))
+				Expect(session.Err).To(gbytes.Say(errMsg))
 			})
 		})
 
 		Context("when more then one file matches the manifest path", func() {
 			BeforeEach(func() {
 				_, err := ioutil.TempFile(tmpDir, "manifest-some-glob.yml_")
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns an error", func() {
@@ -210,11 +210,11 @@ var _ = Describe("Out", func() {
 					GinkgoWriter,
 					GinkgoWriter,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(session).Should(gexec.Exit(1))
 				errMsg := fmt.Sprintf("error invalid manifest path: found 2 files instead of 1 at path: %s", filepath.Join(tmpDir, `manifest-\*.yml_\*`))
-				Ω(session.Err).Should(gbytes.Say(errMsg))
+				Expect(session.Err).To(gbytes.Say(errMsg))
 			})
 		})
 
@@ -229,19 +229,19 @@ var _ = Describe("Out", func() {
 					GinkgoWriter,
 					GinkgoWriter,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(session).Should(gexec.Exit(1))
 
 				errMsg := fmt.Sprintf("error invalid path: found 0 files instead of 1 at path: %s", filepath.Join(tmpDir, `nope-\*`))
-				Ω(session.Err).Should(gbytes.Say(errMsg))
+				Expect(session.Err).To(gbytes.Say(errMsg))
 			})
 		})
 
 		Context("when more then one file matches the manifest path", func() {
 			BeforeEach(func() {
 				_, err := ioutil.TempFile(tmpDir, "another-path.jar_")
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 			})
 
 			It("returns an error", func() {
@@ -250,11 +250,11 @@ var _ = Describe("Out", func() {
 					GinkgoWriter,
 					GinkgoWriter,
 				)
-				Ω(err).ShouldNot(HaveOccurred())
+				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(session).Should(gexec.Exit(1))
 				errMsg := fmt.Sprintf("error invalid path: found 2 files instead of 1 at path: %s", filepath.Join(tmpDir, `another-path.jar\*`))
-				Ω(session.Err).Should(gbytes.Say(errMsg))
+				Expect(session.Err).To(gbytes.Say(errMsg))
 			})
 		})
 	})
