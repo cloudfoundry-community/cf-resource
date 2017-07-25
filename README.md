@@ -13,7 +13,7 @@ Cloud Foundry deployment.
 * `space`: *Required.* The space to push the application to.
 * `skip_cert_check`: *Optional.* Check the validity of the CF SSL cert.
   Defaults to `false`.
-* `command_environment_variables`: *Optional.* Map of `CF_` environment variables.
+* `command_environment_variables`: *Optional.* Environment variables set on the `cf` CLI process.
   See [cf-cli](https://docs.cloudfoundry.org/cf-cli/cf-help.html#environment-variables)
   Note: `CF_COLOR` is set to `true` by default.
 
