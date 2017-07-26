@@ -1,6 +1,7 @@
 package out
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 )
@@ -11,10 +12,13 @@ type PAAS interface {
 	PushApp(manifest string, path string, currentAppName string) error
 }
 
-type CloudFoundry struct{}
+type CloudFoundry struct {
+	ConfiguredEnvironment map[string]interface{}
+	OsEnvironment         []string
+}
 
-func NewCloudFoundry() *CloudFoundry {
-	return &CloudFoundry{}
+func NewCloudFoundry(configuredEnvironment map[string]interface{}, osEnvironment []string) *CloudFoundry {
+	return &CloudFoundry{configuredEnvironment, osEnvironment}
 }
 
 func (cf *CloudFoundry) Login(api string, username string, password string, insecure bool) error {
@@ -78,7 +82,12 @@ func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd := exec.Command("cf", args...)
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
-	cmd.Env = append(os.Environ(), "CF_COLOR=true")
+
+	environment := cf.OsEnvironment
+	for k, v := range cf.ConfiguredEnvironment {
+		environment = append(environment, fmt.Sprintf("%s=%v", k, v))
+	}
+	cmd.Env = environment
 
 	return cmd
 }
