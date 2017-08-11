@@ -19,13 +19,13 @@ var _ = Describe("Manifest", func() {
 		})
 
 		It("can parse a manifest", func() {
-			Expect(err).NotTo(HaveOccurred())
+			Ω(err).ShouldNot(HaveOccurred())
 		})
 
 		It("can extract the environment variables", func() {
 			envVars := manifest.EnvironmentVariables()
-			Expect(envVars["MANIFEST_A"]).To(Equal("manifest_a"))
-			Expect(envVars["MANIFEST_B"]).To(Equal("manifest_b"))
+			Ω(envVars["MANIFEST_A"]).Should(Equal("manifest_a"))
+			Ω(envVars["MANIFEST_B"]).Should(Equal("manifest_b"))
 		})
 
 		Context("when updated", func() {
@@ -37,17 +37,17 @@ var _ = Describe("Manifest", func() {
 
 			It("can write out a modified manifest", func() {
 				tempFile, err = ioutil.TempFile("assets", "manifest_test.yml_")
-				Expect(err).NotTo(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 
 				manifest.AddEnvironmentVariable("MANIFEST_TEST_A", "manifest_test_a")
 				err = manifest.Save(tempFile.Name())
-				Expect(err).NotTo(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 
 				updatedManifest, err := out.NewManifest(tempFile.Name())
-				Expect(err).NotTo(HaveOccurred())
-				Expect(updatedManifest.EnvironmentVariables()["MANIFEST_A"]).To(Equal("manifest_a"))
-				Expect(updatedManifest.EnvironmentVariables()["MANIFEST_B"]).To(Equal("manifest_b"))
-				Expect(updatedManifest.EnvironmentVariables()["MANIFEST_TEST_A"]).To(Equal("manifest_test_a"))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_A"]).Should(Equal("manifest_a"))
+				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_B"]).Should(Equal("manifest_b"))
+				Ω(updatedManifest.EnvironmentVariables()["MANIFEST_TEST_A"]).Should(Equal("manifest_test_a"))
 			})
 		})
 	})
@@ -55,14 +55,14 @@ var _ = Describe("Manifest", func() {
 	Context("invalid manifest path", func() {
 		It("returns an error", func() {
 			_, err := out.NewManifest("invalid path")
-			Expect(err).To(HaveOccurred())
+			Ω(err).Should(HaveOccurred())
 		})
 	})
 
 	Context("invalid manifest YAML", func() {
 		It("returns an error", func() {
 			_, err := out.NewManifest("invalidManifest.yml")
-			Expect(err).To(HaveOccurred())
+			Ω(err).Should(HaveOccurred())
 		})
 	})
 })

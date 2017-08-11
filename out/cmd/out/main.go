@@ -15,6 +15,9 @@ func main() {
 		os.Exit(1)
 	}
 
+	cloudFoundry := out.NewCloudFoundry()
+	command := out.NewCommand(cloudFoundry)
+
 	var request out.Request
 	if err := json.NewDecoder(os.Stdin).Decode(&request); err != nil {
 		fatal("reading request from stdin", err)
@@ -48,11 +51,6 @@ func main() {
 		request.Params.Path = pathFiles[0]
 	}
 
-	env := makeMap(request.Source.CommandEnvironmentVariables)
-	env["CF_COLOR"] = true
-	cloudFoundry := out.NewCloudFoundry(env, os.Environ())
-	command := out.NewCommand(cloudFoundry)
-
 	response, err := command.Run(request)
 	if err != nil {
 		fatal("running command", err)
@@ -66,12 +64,4 @@ func main() {
 func fatal(message string, err error) {
 	fmt.Fprintf(os.Stderr, "error %s: %s\n", message, err)
 	os.Exit(1)
-}
-
-func makeMap(m map[string]interface{}) map[string]interface{} {
-	if m != nil {
-		return m
-	} else {
-		return make(map[string]interface{})
-	}
 }

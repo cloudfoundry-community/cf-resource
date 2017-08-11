@@ -80,7 +80,7 @@ func (command *Command) setEnvironmentVariables(request Request) error {
 	}
 
 	err = manifest.Save(request.Params.ManifestPath)
-	if err != nil {
+	if (err != nil) {
 		return err
 	}
 

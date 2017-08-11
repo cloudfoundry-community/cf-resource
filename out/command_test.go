@@ -43,16 +43,16 @@ var _ = Describe("Out Command", func() {
 	Describe("running the command", func() {
 		It("pushes an application into cloud foundry", func() {
 			response, err := command.Run(request)
-			Expect(err).NotTo(HaveOccurred())
+			Ω(err).ShouldNot(HaveOccurred())
 
-			Expect(response.Version.Timestamp).To(BeTemporally("~", time.Now(), time.Second))
-			Expect(response.Metadata[0]).To(Equal(
+			Ω(response.Version.Timestamp).Should(BeTemporally("~", time.Now(), time.Second))
+			Ω(response.Metadata[0]).Should(Equal(
 				resource.MetadataPair{
 					Name:  "organization",
 					Value: "secret",
 				},
 			))
-			Expect(response.Metadata[1]).To(Equal(
+			Ω(response.Metadata[1]).Should(Equal(
 				resource.MetadataPair{
 					Name:  "space",
 					Value: "volcano-base",
@@ -60,28 +60,28 @@ var _ = Describe("Out Command", func() {
 			))
 
 			By("logging in")
-			Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
+			Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))
 
 			api, username, password, insecure := cloudFoundry.LoginArgsForCall(0)
-			Expect(api).To(Equal("https://api.run.pivotal.io"))
-			Expect(username).To(Equal("awesome@example.com"))
-			Expect(password).To(Equal("hunter2"))
-			Expect(insecure).To(Equal(false))
+			Ω(api).Should(Equal("https://api.run.pivotal.io"))
+			Ω(username).Should(Equal("awesome@example.com"))
+			Ω(password).Should(Equal("hunter2"))
+			Ω(insecure).Should(Equal(false))
 
 			By("targetting the organization and space")
-			Expect(cloudFoundry.TargetCallCount()).To(Equal(1))
+			Ω(cloudFoundry.TargetCallCount()).Should(Equal(1))
 
 			org, space := cloudFoundry.TargetArgsForCall(0)
-			Expect(org).To(Equal("secret"))
-			Expect(space).To(Equal("volcano-base"))
+			Ω(org).Should(Equal("secret"))
+			Ω(space).Should(Equal("volcano-base"))
 
 			By("pushing the app")
-			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
+			Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
 
 			manifest, path, currentAppName := cloudFoundry.PushAppArgsForCall(0)
-			Expect(manifest).To(Equal("assets/manifest.yml"))
-			Expect(path).To(Equal(""))
-			Expect(currentAppName).To(Equal(""))
+			Ω(manifest).Should(Equal("assets/manifest.yml"))
+			Ω(path).Should(Equal(""))
+			Ω(currentAppName).Should(Equal(""))
 		})
 
 		Describe("handling any errors", func() {
@@ -95,21 +95,21 @@ var _ = Describe("Out Command", func() {
 				cloudFoundry.LoginReturns(expectedError)
 
 				_, err := command.Run(request)
-				Expect(err).To(MatchError(expectedError))
+				Ω(err).Should(MatchError(expectedError))
 			})
 
 			It("from targetting an org and space", func() {
 				cloudFoundry.TargetReturns(expectedError)
 
 				_, err := command.Run(request)
-				Expect(err).To(MatchError(expectedError))
+				Ω(err).Should(MatchError(expectedError))
 			})
 
 			It("from pushing the application", func() {
 				cloudFoundry.PushAppReturns(expectedError)
 
 				_, err := command.Run(request)
-				Expect(err).To(MatchError(expectedError))
+				Ω(err).Should(MatchError(expectedError))
 			})
 		})
 
@@ -119,11 +119,11 @@ var _ = Describe("Out Command", func() {
 
 			BeforeEach(func() {
 				sourceFile, err := os.Open("assets/manifest.yml")
-				Expect(err).NotTo(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 				defer sourceFile.Close()
 
 				tempFile, err = ioutil.TempFile("assets", "command_test.yml_")
-				Expect(err).NotTo(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 				defer tempFile.Close()
 
 				_, err = io.Copy(tempFile, sourceFile)
@@ -152,24 +152,24 @@ var _ = Describe("Out Command", func() {
 			})
 
 			It("does not raise an error", func() {
-				Expect(err).NotTo(HaveOccurred())
+				Ω(err).ShouldNot(HaveOccurred())
 			})
 
 			It("writes the variables into the manifest", func() {
 				manifest, _ := out.NewManifest(request.Params.ManifestPath)
 
-				Expect(manifest.EnvironmentVariables()["COMMAND_TEST_A"]).To(Equal("command_test_a"))
-				Expect(manifest.EnvironmentVariables()["COMMAND_TEST_B"]).To(Equal("command_test_b"))
+				Ω(manifest.EnvironmentVariables()["COMMAND_TEST_A"]).Should(Equal("command_test_a"))
+				Ω(manifest.EnvironmentVariables()["COMMAND_TEST_B"]).Should(Equal("command_test_b"))
 			})
 		})
 
 		Context("no environment variables provided", func() {
 			It("doesn't set the environment variables", func() {
 				manifest, err := out.NewManifest(request.Params.ManifestPath)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(manifest.EnvironmentVariables()).To(HaveLen(2))
-				Expect(manifest.EnvironmentVariables()).To(HaveKeyWithValue("MANIFEST_A", "manifest_a"))
-				Expect(manifest.EnvironmentVariables()).To(HaveKeyWithValue("MANIFEST_B", "manifest_b"))
+				Ω(err).ShouldNot(HaveOccurred())
+				Ω(manifest.EnvironmentVariables()).Should(HaveLen(2))
+				Ω(manifest.EnvironmentVariables()).Should(HaveKeyWithValue("MANIFEST_A", "manifest_a"))
+				Ω(manifest.EnvironmentVariables()).Should(HaveKeyWithValue("MANIFEST_B", "manifest_b"))
 			})
 		})
 
@@ -189,13 +189,13 @@ var _ = Describe("Out Command", func() {
 			}
 
 			_, err := command.Run(request)
-			Expect(err).NotTo(HaveOccurred())
+			Ω(err).ShouldNot(HaveOccurred())
 
 			By("logging in")
-			Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
+			Ω(cloudFoundry.LoginCallCount()).Should(Equal(1))
 
 			_, _, _, insecure := cloudFoundry.LoginArgsForCall(0)
-			Expect(insecure).To(Equal(true))
+			Ω(insecure).Should(Equal(true))
 		})
 
 		It("lets people do a zero downtime deploy", func() {
@@ -214,13 +214,13 @@ var _ = Describe("Out Command", func() {
 			}
 
 			_, err := command.Run(request)
-			Expect(err).NotTo(HaveOccurred())
+			Ω(err).ShouldNot(HaveOccurred())
 
 			By("pushing the app")
-			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
+			Ω(cloudFoundry.PushAppCallCount()).Should(Equal(1))
 
 			_, _, currentAppName := cloudFoundry.PushAppArgsForCall(0)
-			Expect(currentAppName).To(Equal("cool-app-name"))
+			Ω(currentAppName).Should(Equal("cool-app-name"))
 		})
 	})
 })

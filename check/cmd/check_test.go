@@ -12,13 +12,13 @@ import (
 var _ = Describe("Check", func() {
 	It("outputs an empty JSON array so that it satisfies the resource interface", func() {
 		bin, err := Build("github.com/concourse/cf-resource/check/cmd/check")
-		Expect(err).NotTo(HaveOccurred())
+		Ω(err).ShouldNot(HaveOccurred())
 
 		cmd := exec.Command(bin)
 		session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
-		Expect(err).NotTo(HaveOccurred())
+		Ω(err).ShouldNot(HaveOccurred())
 
 		Eventually(session).Should(Exit(0))
-		Expect(session.Out).To(Say(`\[\]`))
+		Ω(session.Out).Should(Say(`\[\]`))
 	})
 })

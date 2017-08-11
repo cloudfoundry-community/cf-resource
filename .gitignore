@@ -27,13 +27,3 @@ _testmain.go
 /test.json
 /*.tar.gz
 /built*
-
-# IDE
-*.iml
-.idea
-.idea/**/*
-*.swp
-**/build
-
-# OSX
-**/.DS_Store
