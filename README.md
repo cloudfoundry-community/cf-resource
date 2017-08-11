@@ -35,10 +35,6 @@ be specified.
 * `current_app_name`: *Optional.* This should be the name of the application
   that this will re-deploy over. If this is set the resource will perform a
   zero-downtime deploy.
-* `environment_variables`: *Optional.* [Environment variables of the container
-  running your app on Cloud Foundry][environment-variables].
-
-[environment-variables]: https://docs.cloudfoundry.org/devguide/deploy-apps/manifest.html#env-block
 
 ## Pipeline example
 
