@@ -79,6 +79,6 @@ func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
 	cmd.Env = append(os.Environ(), "CF_COLOR=true")
-
+	cmd.Env = append(os.Environ(), "CF_DIAL_TIMEOUT=30")
 	return cmd
 }
