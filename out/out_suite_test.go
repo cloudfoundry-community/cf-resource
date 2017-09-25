@@ -1,6 +1,8 @@
 package out_test
 
 import (
+	"os"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gexec"
@@ -18,8 +20,12 @@ var binPath string
 var _ = BeforeSuite(func() {
 	var err error
 
-	binPath, err = gexec.Build("github.com/concourse/cf-resource/out/cmd/out")
-	Expect(err).NotTo(HaveOccurred())
+	if _, err = os.Stat("/opt/resource/out"); err == nil {
+		binPath = "/opt/resource/out"
+	} else {
+		binPath, err = gexec.Build("github.com/concourse/cf-resource/out/cmd/out")
+		Expect(err).NotTo(HaveOccurred())
+	}
 })
 
 var _ = AfterSuite(func() {

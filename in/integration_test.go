@@ -25,8 +25,17 @@ var _ = Describe("In", func() {
 	)
 
 	JustBeforeEach(func() {
-		binPath, err := gexec.Build("github.com/concourse/cf-resource/in/cmd/in")
-		Expect(err).NotTo(HaveOccurred())
+		var (
+			binPath string
+			err     error
+		)
+
+		if _, err = os.Stat("/opt/resource/in"); err == nil {
+			binPath = "/opt/resource/in"
+		} else {
+			binPath, err = gexec.Build("github.com/concourse/cf-resource/in/cmd/in")
+			Expect(err).NotTo(HaveOccurred())
+		}
 
 		tmpDir, err = ioutil.TempDir("", "cf_resource_in")
 

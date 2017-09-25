@@ -1,6 +1,7 @@
 package cmd_test
 
 import (
+	"os"
 	"os/exec"
 
 	. "github.com/onsi/ginkgo"
@@ -11,9 +12,16 @@ import (
 
 var _ = Describe("Check", func() {
 	It("outputs an empty JSON array so that it satisfies the resource interface", func() {
-		bin, err := Build("github.com/concourse/cf-resource/check/cmd/check")
-		Expect(err).NotTo(HaveOccurred())
-
+		var (
+			err error
+			bin string
+		)
+		if _, err = os.Stat("/opt/resource/check"); err == nil {
+			bin = "/opt/resource/check"
+		} else {
+			bin, err = Build("github.com/concourse/cf-resource/check/cmd/check")
+			Expect(err).NotTo(HaveOccurred())
+		}
 		cmd := exec.Command(bin)
 		session, err := Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())

@@ -117,7 +117,7 @@ var _ = Describe("Out", func() {
 			Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 			// color should be always
-			Expect(session.Err).To(gbytes.Say("CF_COLOR=true"))
+			Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
 		})
 	})
 
@@ -164,7 +164,7 @@ var _ = Describe("Out", func() {
 				))
 
 				// color should be always
-				Expect(session.Err).To(gbytes.Say("CF_COLOR=true"))
+				Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
 			})
 		})
 
