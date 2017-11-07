@@ -32,6 +32,7 @@ be specified.
 * `current_app_name`: *Optional.* This should be the name of the application
   that this will re-deploy over. If this is set the resource will perform a
   zero-downtime deploy.
+* `environment_variables`: *Optional.* It is not necessary to set the variables in [manifest][cf-manifests] if this parameter is set.
 
 ## Pipeline example
 
