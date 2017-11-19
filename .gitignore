@@ -27,3 +27,6 @@ _testmain.go
 /test.json
 /*.tar.gz
 /built*
+
+# GoLand
+.idea
