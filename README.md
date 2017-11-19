@@ -33,6 +33,7 @@ be specified.
   that this will re-deploy over. If this is set the resource will perform a
   zero-downtime deploy.
 * `environment_variables`: *Optional.* It is not necessary to set the variables in [manifest][cf-manifests] if this parameter is set.
+* `docker_password`: *Optional.* This is used to authenticate against a protected docker registry.
 
 ## Pipeline example
 

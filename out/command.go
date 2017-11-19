@@ -4,7 +4,10 @@ import (
 	"time"
 
 	"github.com/concourse/cf-resource"
+	"os"
 )
+
+const CfDockerPassword = "CF_DOCKER_PASSWORD"
 
 type Command struct {
 	paas PAAS
@@ -37,6 +40,10 @@ func (command *Command) Run(request Request) (Response, error) {
 
 	if err := command.setEnvironmentVariables(request); err != nil {
 		return Response{}, err
+	}
+
+	if request.Params.DockerPassword != "" {
+		os.Setenv(CfDockerPassword, request.Params.DockerPassword)
 	}
 
 	err = command.paas.PushApp(

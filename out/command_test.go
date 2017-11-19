@@ -222,5 +222,75 @@ var _ = Describe("Out Command", func() {
 			_, _, currentAppName := cloudFoundry.PushAppArgsForCall(0)
 			Expect(currentAppName).To(Equal("cool-app-name"))
 		})
+
+		Context("using a docker registry which requires authentication", func() {
+
+			var savedVar string
+
+			BeforeEach(func() {
+				savedVar = saveCurrentVariable()
+			})
+
+			AfterEach(func() {
+				restoreOldVariable(savedVar)
+			})
+
+			Context("docker password provided", func() {
+				It("sets the system environment variable", func() {
+					request = out.Request{
+						Source: resource.Source{
+							API:          "https://api.run.pivotal.io",
+							Username:     "awesome@example.com",
+							Password:     "hunter2",
+							Organization: "secret",
+							Space:        "volcano-base",
+						},
+						Params: out.Params{
+							ManifestPath:   "a/path/to/a/manifest/using/docker.yml",
+							DockerPassword: "mySuperSecretPassword",
+						},
+					}
+					_, err := command.Run(request)
+					Expect(err).NotTo(HaveOccurred())
+
+					By("pushing the app")
+					Expect(os.Getenv(out.CfDockerPassword)).To(Equal("mySuperSecretPassword"))
+					Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
+				})
+			})
+
+			Context("no docker password provided", func() {
+				It("doesn't set the system environment variable", func() {
+					request = out.Request{
+						Source: resource.Source{
+							API:          "https://api.run.pivotal.io",
+							Username:     "awesome@example.com",
+							Password:     "hunter2",
+							Organization: "secret",
+							Space:        "volcano-base",
+						},
+						Params: out.Params{
+							ManifestPath: "a/path/to/a/manifest/using/docker.yml",
+						},
+					}
+					os.Setenv(out.CfDockerPassword, "MyOwnUntouchedVariable")
+
+					_, err := command.Run(request)
+					Expect(err).NotTo(HaveOccurred())
+
+					By("pushing the app")
+					Expect(os.Getenv(out.CfDockerPassword)).To(Equal("MyOwnUntouchedVariable"))
+					Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
+				})
+			})
+		})
 	})
 })
+
+func restoreOldVariable(currentEnvironmentVariable string) error {
+	return os.Setenv(out.CfDockerPassword, currentEnvironmentVariable)
+}
+
+func saveCurrentVariable() string {
+	return os.Getenv(out.CfDockerPassword)
+}
