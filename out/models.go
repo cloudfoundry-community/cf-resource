@@ -12,6 +12,8 @@ type Params struct {
 	Path                 string            `json:"path"`
 	CurrentAppName       string            `json:"current_app_name"`
 	EnvironmentVariables map[string]string `json:"environment_variables"`
+	DockerUsername       string            `json:"docker_username"`
+	DockerPassword       string            `json:"docker_password"`
 }
 
 type Response struct {
