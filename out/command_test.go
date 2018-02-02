@@ -8,11 +8,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"io"
+	"io/ioutil"
+
 	"github.com/concourse/cf-resource"
 	"github.com/concourse/cf-resource/out"
 	"github.com/concourse/cf-resource/out/outfakes"
-	"io"
-	"io/ioutil"
 )
 
 var _ = Describe("Out Command", func() {
@@ -78,11 +79,12 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			manifest, path, currentAppName, dockerUser := cloudFoundry.PushAppArgsForCall(0)
+			manifest, path, currentAppName, dockerUser, showAppLog := cloudFoundry.PushAppArgsForCall(0)
 			Expect(manifest).To(Equal("assets/manifest.yml"))
 			Expect(path).To(Equal(""))
 			Expect(currentAppName).To(Equal(""))
 			Expect(dockerUser).To(Equal(""))
+			Expect(showAppLog).To(Equal(false))
 		})
 
 		Describe("handling any errors", func() {
@@ -220,7 +222,7 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			_, _, currentAppName, _ := cloudFoundry.PushAppArgsForCall(0)
+			_, _, currentAppName, _, _ := cloudFoundry.PushAppArgsForCall(0)
 			Expect(currentAppName).To(Equal("cool-app-name"))
 		})
 
@@ -246,7 +248,7 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			_, _, _, dockerUser := cloudFoundry.PushAppArgsForCall(0)
+			_, _, _, dockerUser, _ := cloudFoundry.PushAppArgsForCall(0)
 			Expect(dockerUser).To(Equal("DOCKER_USER"))
 		})
 

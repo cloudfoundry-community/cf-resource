@@ -14,6 +14,7 @@ type Params struct {
 	EnvironmentVariables map[string]string `json:"environment_variables"`
 	DockerUsername       string            `json:"docker_username"`
 	DockerPassword       string            `json:"docker_password"`
+	ShowAppLog           bool              `json:"show_app_log"`
 }
 
 type Response struct {

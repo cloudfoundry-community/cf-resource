@@ -3,8 +3,9 @@ package out
 import (
 	"time"
 
-	"github.com/concourse/cf-resource"
 	"os"
+
+	"github.com/concourse/cf-resource"
 )
 
 const CfDockerPassword = "CF_DOCKER_PASSWORD"
@@ -51,6 +52,7 @@ func (command *Command) Run(request Request) (Response, error) {
 		request.Params.Path,
 		request.Params.CurrentAppName,
 		request.Params.DockerUsername,
+		request.Params.ShowAppLog,
 	)
 	if err != nil {
 		return Response{}, err
