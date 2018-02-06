@@ -119,7 +119,7 @@ var _ = Describe("Out", func() {
 
 			// color should be always
 			Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
-			Eventually(session.Err).Should(gbytes.Say("CF_TRACE=true"))
+			Eventually(session.Err).Should(gbytes.Say("CF_TRACE=/dev/stderr"))
 		})
 	})
 
