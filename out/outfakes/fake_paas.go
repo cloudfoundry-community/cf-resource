@@ -34,7 +34,7 @@ type FakePAAS struct {
 	targetReturnsOnCall map[int]struct {
 		result1 error
 	}
-	PushAppStub        func(manifest string, path string, currentAppName string, dockerUser string, showLogs bool, verbose bool) error
+	PushAppStub        func(manifest string, path string, currentAppName string, dockerUser string, showLogs bool) error
 	pushAppMutex       sync.RWMutex
 	pushAppArgsForCall []struct {
 		manifest       string
@@ -42,7 +42,6 @@ type FakePAAS struct {
 		currentAppName string
 		dockerUser     string
 		showLogs       bool
-		verbose        bool
 	}
 	pushAppReturns struct {
 		result1 error
@@ -154,7 +153,7 @@ func (fake *FakePAAS) TargetReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool, verbose bool) error {
+func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool) error {
 	fake.pushAppMutex.Lock()
 	ret, specificReturn := fake.pushAppReturnsOnCall[len(fake.pushAppArgsForCall)]
 	fake.pushAppArgsForCall = append(fake.pushAppArgsForCall, struct {
@@ -163,12 +162,11 @@ func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName strin
 		currentAppName string
 		dockerUser     string
 		showLogs       bool
-		verbose        bool
-	}{manifest, path, currentAppName, dockerUser, showLogs, verbose})
-	fake.recordInvocation("PushApp", []interface{}{manifest, path, currentAppName, dockerUser, showLogs, verbose})
+	}{manifest, path, currentAppName, dockerUser, showLogs})
+	fake.recordInvocation("PushApp", []interface{}{manifest, path, currentAppName, dockerUser, showLogs})
 	fake.pushAppMutex.Unlock()
 	if fake.PushAppStub != nil {
-		return fake.PushAppStub(manifest, path, currentAppName, dockerUser, showLogs, verbose)
+		return fake.PushAppStub(manifest, path, currentAppName, dockerUser, showLogs)
 	}
 	if specificReturn {
 		return ret.result1
@@ -182,10 +180,10 @@ func (fake *FakePAAS) PushAppCallCount() int {
 	return len(fake.pushAppArgsForCall)
 }
 
-func (fake *FakePAAS) PushAppArgsForCall(i int) (string, string, string, string, bool, bool) {
+func (fake *FakePAAS) PushAppArgsForCall(i int) (string, string, string, string, bool) {
 	fake.pushAppMutex.RLock()
 	defer fake.pushAppMutex.RUnlock()
-	return fake.pushAppArgsForCall[i].manifest, fake.pushAppArgsForCall[i].path, fake.pushAppArgsForCall[i].currentAppName, fake.pushAppArgsForCall[i].dockerUser, fake.pushAppArgsForCall[i].showLogs, fake.pushAppArgsForCall[i].verbose
+	return fake.pushAppArgsForCall[i].manifest, fake.pushAppArgsForCall[i].path, fake.pushAppArgsForCall[i].currentAppName, fake.pushAppArgsForCall[i].dockerUser, fake.pushAppArgsForCall[i].showLogs
 }
 
 func (fake *FakePAAS) PushAppReturns(result1 error) {

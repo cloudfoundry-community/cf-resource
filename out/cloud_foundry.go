@@ -9,13 +9,15 @@ import (
 type PAAS interface {
 	Login(api string, username string, password string, insecure bool) error
 	Target(organization string, space string) error
-	PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool, verbose bool) error
+	PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool) error
 }
 
-type CloudFoundry struct{}
+type CloudFoundry struct {
+	verbose bool
+}
 
-func NewCloudFoundry() *CloudFoundry {
-	return &CloudFoundry{}
+func NewCloudFoundry(verbose bool) *CloudFoundry {
+	return &CloudFoundry{verbose}
 }
 
 func (cf *CloudFoundry) Login(api string, username string, password string, insecure bool) error {
@@ -36,12 +38,8 @@ func (cf *CloudFoundry) Target(organization string, space string) error {
 	return cf.cf("target", "-o", organization, "-s", space).Run()
 }
 
-func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool, verbose bool) error {
+func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool) error {
 	args := []string{}
-
-	if verbose {
-		args = append(args, "-v")
-	}
 
 	if currentAppName == "" {
 		args = append(args, "push", "-f", manifest)
@@ -91,5 +89,10 @@ func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
 	cmd.Env = append(os.Environ(), "CF_COLOR=true", "CF_DIAL_TIMEOUT=30")
+
+	if cf.verbose {
+		cmd.Env = append(cmd.Env, "CF_TRACE=true")
+	}
+
 	return cmd
 }

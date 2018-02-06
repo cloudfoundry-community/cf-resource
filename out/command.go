@@ -53,7 +53,6 @@ func (command *Command) Run(request Request) (Response, error) {
 		request.Params.CurrentAppName,
 		request.Params.DockerUsername,
 		request.Params.ShowAppLog,
-		request.Params.Verbose,
 	)
 	if err != nil {
 		return Response{}, err

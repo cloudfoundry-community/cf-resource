@@ -37,7 +37,6 @@ var _ = Describe("Out Command", func() {
 			},
 			Params: out.Params{
 				ManifestPath: "assets/manifest.yml",
-				Verbose:      true,
 			},
 		}
 	})
@@ -80,13 +79,12 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			manifest, path, currentAppName, dockerUser, showAppLog, verbose := cloudFoundry.PushAppArgsForCall(0)
+			manifest, path, currentAppName, dockerUser, showAppLog := cloudFoundry.PushAppArgsForCall(0)
 			Expect(manifest).To(Equal(request.Params.ManifestPath))
 			Expect(path).To(Equal(""))
 			Expect(currentAppName).To(Equal(""))
 			Expect(dockerUser).To(Equal(""))
 			Expect(showAppLog).To(Equal(false))
-			Expect(verbose).To(Equal(request.Params.Verbose))
 		})
 
 		Describe("handling any errors", func() {
@@ -224,7 +222,7 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			_, _, currentAppName, _, _, _ := cloudFoundry.PushAppArgsForCall(0)
+			_, _, currentAppName, _, _ := cloudFoundry.PushAppArgsForCall(0)
 			Expect(currentAppName).To(Equal("cool-app-name"))
 		})
 
@@ -250,7 +248,7 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			_, _, _, dockerUser, _, _ := cloudFoundry.PushAppArgsForCall(0)
+			_, _, _, dockerUser, _ := cloudFoundry.PushAppArgsForCall(0)
 			Expect(dockerUser).To(Equal("DOCKER_USER"))
 		})
 

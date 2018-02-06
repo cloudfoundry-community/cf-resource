@@ -36,7 +36,7 @@ be specified.
 * `docker_username`: *Optional.* This is used as the username to authenticate against a protected docker registry.
 * `docker_password`: *Optional.* This should be the users password when authenticating against a protected docker registry.
 * `show_app_log`: *Optional.* Tails the app log during startup, useful to debug issues when using blue/green deploys together with the `current_app_name` option.
-* `verbos`: *Optional.* Invoke `cf` cli using `-v` to print all API calls made to Cloud Foundry.
+* `verbose`: *Optional.* Invoke `cf` cli using `CF_TRACE=true` to print all API calls made to Cloud Foundry.
 
 ## Pipeline example
 
