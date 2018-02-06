@@ -20,7 +20,7 @@ func main() {
 		fatal("reading request from stdin", err)
 	}
 
-	cloudFoundry := out.NewCloudFoundry(request.Params.Verbose)
+	cloudFoundry := out.NewCloudFoundry(request.Source.Verbose)
 	command := out.NewCommand(cloudFoundry)
 
 	// make it an absolute path
