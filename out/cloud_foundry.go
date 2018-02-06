@@ -91,7 +91,10 @@ func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd.Env = append(os.Environ(), "CF_COLOR=true", "CF_DIAL_TIMEOUT=30")
 
 	if cf.verbose {
-		cmd.Env = append(cmd.Env, "CF_TRACE=true")
+		// we have to set CF_TRACE to direct output directly to stderr due to a known issue in the CF CLI
+		// when used together with cli plugins like cf autopilot (as used by cf-resource)
+		// see also https://github.com/cloudfoundry/cli/blob/master/README.md#known-issues
+		cmd.Env = append(cmd.Env, "CF_TRACE=/dev/stderr")
 	}
 
 	return cmd
