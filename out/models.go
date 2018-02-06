@@ -15,6 +15,7 @@ type Params struct {
 	DockerUsername       string            `json:"docker_username"`
 	DockerPassword       string            `json:"docker_password"`
 	ShowAppLog           bool              `json:"show_app_log"`
+	Verbose              bool              `json:"verbose"`
 }
 
 type Response struct {
