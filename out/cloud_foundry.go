@@ -12,10 +12,12 @@ type PAAS interface {
 	PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool) error
 }
 
-type CloudFoundry struct{}
+type CloudFoundry struct {
+	verbose bool
+}
 
-func NewCloudFoundry() *CloudFoundry {
-	return &CloudFoundry{}
+func NewCloudFoundry(verbose bool) *CloudFoundry {
+	return &CloudFoundry{verbose}
 }
 
 func (cf *CloudFoundry) Login(api string, username string, password string, insecure bool) error {
@@ -87,5 +89,13 @@ func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
 	cmd.Env = append(os.Environ(), "CF_COLOR=true", "CF_DIAL_TIMEOUT=30")
+
+	if cf.verbose {
+		// we have to set CF_TRACE to direct output directly to stderr due to a known issue in the CF CLI
+		// when used together with cli plugins like cf autopilot (as used by cf-resource)
+		// see also https://github.com/cloudfoundry/cli/blob/master/README.md#known-issues
+		cmd.Env = append(cmd.Env, "CF_TRACE=/dev/stderr")
+	}
+
 	return cmd
 }

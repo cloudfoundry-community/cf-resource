@@ -9,6 +9,7 @@ type Source struct {
 	Organization  string `json:"organization"`
 	Space         string `json:"space"`
 	SkipCertCheck bool   `json:"skip_cert_check"`
+	Verbose       bool   `json:"verbose"`
 }
 
 type Version struct {

@@ -80,7 +80,7 @@ var _ = Describe("Out Command", func() {
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
 			manifest, path, currentAppName, dockerUser, showAppLog := cloudFoundry.PushAppArgsForCall(0)
-			Expect(manifest).To(Equal("assets/manifest.yml"))
+			Expect(manifest).To(Equal(request.Params.ManifestPath))
 			Expect(path).To(Equal(""))
 			Expect(currentAppName).To(Equal(""))
 			Expect(dockerUser).To(Equal(""))

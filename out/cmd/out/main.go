@@ -15,13 +15,13 @@ func main() {
 		os.Exit(1)
 	}
 
-	cloudFoundry := out.NewCloudFoundry()
-	command := out.NewCommand(cloudFoundry)
-
 	var request out.Request
 	if err := json.NewDecoder(os.Stdin).Decode(&request); err != nil {
 		fatal("reading request from stdin", err)
 	}
+
+	cloudFoundry := out.NewCloudFoundry(request.Source.Verbose)
+	command := out.NewCommand(cloudFoundry)
 
 	// make it an absolute path
 	request.Params.ManifestPath = filepath.Join(os.Args[1], request.Params.ManifestPath)

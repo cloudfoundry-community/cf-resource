@@ -51,6 +51,7 @@ var _ = Describe("Out", func() {
 				Organization:  "org",
 				Space:         "space",
 				SkipCertCheck: true,
+				Verbose:       true,
 			},
 			Params: out.Params{
 				ManifestPath:   "project/manifest.yml",
@@ -118,6 +119,7 @@ var _ = Describe("Out", func() {
 
 			// color should be always
 			Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
+			Eventually(session.Err).Should(gbytes.Say("CF_TRACE=/dev/stderr"))
 		})
 	})
 
