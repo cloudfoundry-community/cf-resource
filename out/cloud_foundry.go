@@ -7,7 +7,7 @@ import (
 
 //go:generate counterfeiter . PAAS
 type PAAS interface {
-	Login(api string, username string, password string, insecure bool) error
+	Login(api string, username string, password string, clientID string, clientSecret string, insecure bool) error
 	Target(organization string, space string) error
 	PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool) error
 }
@@ -20,7 +20,7 @@ func NewCloudFoundry(verbose bool) *CloudFoundry {
 	return &CloudFoundry{verbose}
 }
 
-func (cf *CloudFoundry) Login(api string, username string, password string, insecure bool) error {
+func (cf *CloudFoundry) Login(api string, username string, password string, clientID string, clientSecret string, insecure bool) error {
 	args := []string{"api", api}
 	if insecure {
 		args = append(args, "--skip-ssl-validation")
@@ -31,6 +31,9 @@ func (cf *CloudFoundry) Login(api string, username string, password string, inse
 		return err
 	}
 
+	if clientID != "" && clientSecret != "" {
+		return cf.cf("auth", "--client-credentials", clientID, clientSecret).Run()
+	}
 	return cf.cf("auth", username, password).Run()
 }
 
