@@ -63,10 +63,12 @@ var _ = Describe("Out Command", func() {
 			By("logging in")
 			Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
 
-			api, username, password, insecure := cloudFoundry.LoginArgsForCall(0)
+			api, username, password, clientID, clientSecret, insecure := cloudFoundry.LoginArgsForCall(0)
 			Expect(api).To(Equal("https://api.run.pivotal.io"))
 			Expect(username).To(Equal("awesome@example.com"))
 			Expect(password).To(Equal("hunter2"))
+			Expect(clientID).To(Equal(""))
+			Expect(clientSecret).To(Equal(""))
 			Expect(insecure).To(Equal(false))
 
 			By("targetting the organization and space")
@@ -197,8 +199,35 @@ var _ = Describe("Out Command", func() {
 			By("logging in")
 			Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
 
-			_, _, _, insecure := cloudFoundry.LoginArgsForCall(0)
+			_, _, _, _, _, insecure := cloudFoundry.LoginArgsForCall(0)
 			Expect(insecure).To(Equal(true))
+		})
+
+		It("lets users authenticate with client credentials", func() {
+			request = out.Request{
+				Source: resource.Source{
+					API:          "https://api.run.pivotal.io",
+					ClientID:     "awesome",
+					ClientSecret: "hunter2",
+					Organization: "secret",
+					Space:        "volcano-base",
+				},
+				Params: out.Params{
+					ManifestPath: "a/path/to/a/manifest.yml",
+				},
+			}
+
+			_, err := command.Run(request)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("logging in")
+			Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
+
+			_, username, password, clientID, clientSecret, _ := cloudFoundry.LoginArgsForCall(0)
+			Expect(username).To(Equal(""))
+			Expect(password).To(Equal(""))
+			Expect(clientID).To(Equal("awesome"))
+			Expect(clientSecret).To(Equal("hunter2"))
 		})
 
 		It("lets people do a zero downtime deploy", func() {

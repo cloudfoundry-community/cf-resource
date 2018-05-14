@@ -6,6 +6,8 @@ type Source struct {
 	API           string `json:"api"`
 	Username      string `json:"username"`
 	Password      string `json:"password"`
+	ClientID      string `json:"client_id"`
+	ClientSecret  string `json:"client_secret"`
 	Organization  string `json:"organization"`
 	Space         string `json:"space"`
 	SkipCertCheck bool   `json:"skip_cert_check"`

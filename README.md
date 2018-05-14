@@ -5,10 +5,14 @@ Cloud Foundry deployment.
 
 ## Source Configuration
 
+Note: you must provide either `username` and `password` or `client_id` and `client_secret`.
+
 * `api`: *Required.* The address of the Cloud Controller in the Cloud Foundry
   deployment.
-* `username`: *Required.* The username used to authenticate.
-* `password`: *Required.* The password used to authenticate.
+* `username`: *Optional.* The username used to authenticate.
+* `password`: *Optional.* The password used to authenticate.
+* `client_id`: *Optional.* The client id used to authenticate.
+* `client_secret`: *Optional.* The client secret used to authenticate.
 * `organization`: *Required.* The organization to push the application to.
 * `space`: *Required.* The space to push the application to.
 * `skip_cert_check`: *Optional.* Check the validity of the CF SSL cert.

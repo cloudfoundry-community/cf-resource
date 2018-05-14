@@ -8,13 +8,15 @@ import (
 )
 
 type FakePAAS struct {
-	LoginStub        func(api string, username string, password string, insecure bool) error
+	LoginStub        func(api string, username string, password string, clientID string, clientSecret string, insecure bool) error
 	loginMutex       sync.RWMutex
 	loginArgsForCall []struct {
-		api      string
-		username string
-		password string
-		insecure bool
+		api          string
+		username     string
+		password     string
+		clientID     string
+		clientSecret string
+		insecure     bool
 	}
 	loginReturns struct {
 		result1 error
@@ -53,19 +55,21 @@ type FakePAAS struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePAAS) Login(api string, username string, password string, insecure bool) error {
+func (fake *FakePAAS) Login(api string, username string, password string, clientID string, clientSecret string, insecure bool) error {
 	fake.loginMutex.Lock()
 	ret, specificReturn := fake.loginReturnsOnCall[len(fake.loginArgsForCall)]
 	fake.loginArgsForCall = append(fake.loginArgsForCall, struct {
-		api      string
-		username string
-		password string
-		insecure bool
-	}{api, username, password, insecure})
-	fake.recordInvocation("Login", []interface{}{api, username, password, insecure})
+		api          string
+		username     string
+		password     string
+		clientID     string
+		clientSecret string
+		insecure     bool
+	}{api, username, password, clientID, clientSecret, insecure})
+	fake.recordInvocation("Login", []interface{}{api, username, password, clientID, clientSecret, insecure})
 	fake.loginMutex.Unlock()
 	if fake.LoginStub != nil {
-		return fake.LoginStub(api, username, password, insecure)
+		return fake.LoginStub(api, username, password, clientID, clientSecret, insecure)
 	}
 	if specificReturn {
 		return ret.result1
@@ -79,10 +83,10 @@ func (fake *FakePAAS) LoginCallCount() int {
 	return len(fake.loginArgsForCall)
 }
 
-func (fake *FakePAAS) LoginArgsForCall(i int) (string, string, string, bool) {
+func (fake *FakePAAS) LoginArgsForCall(i int) (string, string, string, string, string, bool) {
 	fake.loginMutex.RLock()
 	defer fake.loginMutex.RUnlock()
-	return fake.loginArgsForCall[i].api, fake.loginArgsForCall[i].username, fake.loginArgsForCall[i].password, fake.loginArgsForCall[i].insecure
+	return fake.loginArgsForCall[i].api, fake.loginArgsForCall[i].username, fake.loginArgsForCall[i].password, fake.loginArgsForCall[i].clientID, fake.loginArgsForCall[i].clientSecret, fake.loginArgsForCall[i].insecure
 }
 
 func (fake *FakePAAS) LoginReturns(result1 error) {
