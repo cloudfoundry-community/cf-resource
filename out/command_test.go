@@ -81,12 +81,13 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			manifest, path, currentAppName, dockerUser, showAppLog := cloudFoundry.PushAppArgsForCall(0)
+			manifest, path, currentAppName, dockerUser, showAppLog, noStart := cloudFoundry.PushAppArgsForCall(0)
 			Expect(manifest).To(Equal(request.Params.ManifestPath))
 			Expect(path).To(Equal(""))
 			Expect(currentAppName).To(Equal(""))
 			Expect(dockerUser).To(Equal(""))
 			Expect(showAppLog).To(Equal(false))
+			Expect(noStart).To(Equal(false))
 		})
 
 		Describe("handling any errors", func() {
@@ -115,6 +116,22 @@ var _ = Describe("Out Command", func() {
 
 				_, err := command.Run(request)
 				Expect(err).To(MatchError(expectedError))
+			})
+		})
+
+		Describe("no_start handling", func() {
+			Context("when no_start is specified", func() {
+				BeforeEach(func() {
+					request.Params.NoStart = true
+				})
+
+				It("sets noStart to true", func() {
+					_, err := command.Run(request)
+					Expect(err).NotTo(HaveOccurred())
+
+					_, _, _, _, _, noStart := cloudFoundry.PushAppArgsForCall(0)
+					Expect(noStart).To(Equal(true))
+				})
 			})
 		})
 
@@ -251,7 +268,7 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			_, _, currentAppName, _, _ := cloudFoundry.PushAppArgsForCall(0)
+			_, _, currentAppName, _, _, _ := cloudFoundry.PushAppArgsForCall(0)
 			Expect(currentAppName).To(Equal("cool-app-name"))
 		})
 
@@ -277,7 +294,7 @@ var _ = Describe("Out Command", func() {
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
 
-			_, _, _, dockerUser, _ := cloudFoundry.PushAppArgsForCall(0)
+			_, _, _, dockerUser, _, _ := cloudFoundry.PushAppArgsForCall(0)
 			Expect(dockerUser).To(Equal("DOCKER_USER"))
 		})
 
