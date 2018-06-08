@@ -41,6 +41,7 @@ be specified.
 * `docker_username`: *Optional.* This is used as the username to authenticate against a protected docker registry.
 * `docker_password`: *Optional.* This should be the users password when authenticating against a protected docker registry.
 * `show_app_log`: *Optional.* Tails the app log during startup, useful to debug issues when using blue/green deploys together with the `current_app_name` option.
+* `no_start`: *Optional.* Deploys the app but does not start it. This parameter is ignored when `current_app_name` is specified.
 
 ## Pipeline example
 

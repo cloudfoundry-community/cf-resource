@@ -55,6 +55,7 @@ func (command *Command) Run(request Request) (Response, error) {
 		request.Params.CurrentAppName,
 		request.Params.DockerUsername,
 		request.Params.ShowAppLog,
+		request.Params.NoStart,
 	)
 	if err != nil {
 		return Response{}, err
