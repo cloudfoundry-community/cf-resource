@@ -24,18 +24,34 @@ func NewManifest(manifestPath string) (Manifest, error) {
 	return manifest, nil
 }
 
-func (manifest *Manifest) EnvironmentVariables() map[interface{}]interface{} {
-	envVars, hasEnvVars := manifest.data["env"].(map[interface{}]interface{})
-	if !hasEnvVars {
-		envVars = make(map[interface{}]interface{})
-		manifest.data["env"] = envVars
+func (manifest *Manifest) EnvironmentVariables() []map[interface{}]interface{} {
+	apps, hasApps := manifest.data["applications"].([]interface{})
+	if !hasApps {
+		return []map[interface{}]interface{}{}
 	}
-
-	return envVars
+	appEnvVars := make([]map[interface{}]interface{}, len(apps))
+	for appIdx := range apps {
+		app, isApp := apps[appIdx].(map[interface{}]interface{})
+		if !isApp {
+			continue
+		}
+		envVars, hasEnvVars := app["env"].(map[interface{}]interface{})
+		if !hasEnvVars {
+			envVars = make(map[interface{}]interface{})
+			app["env"] = envVars
+		}
+		appEnvVars[appIdx] = envVars
+	}
+	return appEnvVars
 }
 
 func (manifest *Manifest) AddEnvironmentVariable(name, value string) {
-	manifest.EnvironmentVariables()[name] = value
+	appEnvVars := manifest.EnvironmentVariables()
+	for appIdx := range appEnvVars {
+		if appEnvVars[appIdx] != nil {
+			appEnvVars[appIdx][name] = value
+		}
+	}
 }
 
 func (manifest *Manifest) Save(manifestPath string) error {

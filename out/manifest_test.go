@@ -23,9 +23,9 @@ var _ = Describe("Manifest", func() {
 		})
 
 		It("can extract the environment variables", func() {
-			envVars := manifest.EnvironmentVariables()
-			Expect(envVars["MANIFEST_A"]).To(Equal("manifest_a"))
-			Expect(envVars["MANIFEST_B"]).To(Equal("manifest_b"))
+			appEnvVars := manifest.EnvironmentVariables()
+			Expect(appEnvVars[0]["MANIFEST_A"]).To(Equal("manifest_a"))
+			Expect(appEnvVars[0]["MANIFEST_B"]).To(Equal("manifest_b"))
 		})
 
 		Context("when updated", func() {
@@ -45,9 +45,9 @@ var _ = Describe("Manifest", func() {
 
 				updatedManifest, err := out.NewManifest(tempFile.Name())
 				Expect(err).NotTo(HaveOccurred())
-				Expect(updatedManifest.EnvironmentVariables()["MANIFEST_A"]).To(Equal("manifest_a"))
-				Expect(updatedManifest.EnvironmentVariables()["MANIFEST_B"]).To(Equal("manifest_b"))
-				Expect(updatedManifest.EnvironmentVariables()["MANIFEST_TEST_A"]).To(Equal("manifest_test_a"))
+				Expect(updatedManifest.EnvironmentVariables()[0]["MANIFEST_A"]).To(Equal("manifest_a"))
+				Expect(updatedManifest.EnvironmentVariables()[0]["MANIFEST_B"]).To(Equal("manifest_b"))
+				Expect(updatedManifest.EnvironmentVariables()[0]["MANIFEST_TEST_A"]).To(Equal("manifest_test_a"))
 			})
 		})
 	})
