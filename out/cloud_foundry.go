@@ -1,6 +1,7 @@
 package out
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 )
@@ -9,7 +10,7 @@ import (
 type PAAS interface {
 	Login(api string, username string, password string, clientID string, clientSecret string, insecure bool) error
 	Target(organization string, space string) error
-	PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool, noStart bool) error
+	PushApp(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool) error
 }
 
 type CloudFoundry struct {
@@ -41,7 +42,15 @@ func (cf *CloudFoundry) Target(organization string, space string) error {
 	return cf.cf("target", "-o", organization, "-s", space).Run()
 }
 
-func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName string, dockerUser string, showLogs bool, noStart bool) error {
+func (cf *CloudFoundry) PushApp(
+	manifest string,
+	path string, currentAppName string,
+	vars map[string]interface{},
+	varsFiles []string,
+	dockerUser string,
+	showLogs bool,
+	noStart bool,
+) error {
 	args := []string{}
 
 	if currentAppName == "" {
@@ -54,6 +63,14 @@ func (cf *CloudFoundry) PushApp(manifest string, path string, currentAppName str
 		if showLogs {
 			args = append(args, "--show-app-log")
 		}
+	}
+
+	for name, value := range vars {
+		args = append(args, "--var", fmt.Sprintf("%s=%s", name, value))
+	}
+
+	for _, varsFile := range varsFiles {
+		args = append(args, "--vars-file", varsFile)
 	}
 
 	if dockerUser != "" {
