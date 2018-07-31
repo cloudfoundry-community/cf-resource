@@ -48,6 +48,7 @@ var _ = Describe("Manifest", func() {
 				Expect(updatedManifest.EnvironmentVariables()[0]["MANIFEST_A"]).To(Equal("manifest_a"))
 				Expect(updatedManifest.EnvironmentVariables()[0]["MANIFEST_B"]).To(Equal("manifest_b"))
 				Expect(updatedManifest.EnvironmentVariables()[0]["MANIFEST_TEST_A"]).To(Equal("manifest_test_a"))
+				Expect(updatedManifest.EnvironmentVariables()[1]["MANIFEST_TEST_A"]).To(Equal("manifest_test_a"))
 			})
 		})
 	})
