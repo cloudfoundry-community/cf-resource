@@ -1,3 +1,6 @@
-env:
-  MANIFEST_A: manifest_a
-  MANIFEST_B: manifest_b
+applications:
+- name: app1
+  env:
+    MANIFEST_A: manifest_a
+    MANIFEST_B: manifest_b
+- name: app2

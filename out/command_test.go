@@ -180,8 +180,10 @@ var _ = Describe("Out Command", func() {
 			It("writes the variables into the manifest", func() {
 				manifest, _ := out.NewManifest(request.Params.ManifestPath)
 
-				Expect(manifest.EnvironmentVariables()["COMMAND_TEST_A"]).To(Equal("command_test_a"))
-				Expect(manifest.EnvironmentVariables()["COMMAND_TEST_B"]).To(Equal("command_test_b"))
+				Expect(manifest.EnvironmentVariables()[0]["COMMAND_TEST_A"]).To(Equal("command_test_a"))
+				Expect(manifest.EnvironmentVariables()[0]["COMMAND_TEST_B"]).To(Equal("command_test_b"))
+				Expect(manifest.EnvironmentVariables()[1]["COMMAND_TEST_A"]).To(Equal("command_test_a"))
+				Expect(manifest.EnvironmentVariables()[1]["COMMAND_TEST_B"]).To(Equal("command_test_b"))
 			})
 		})
 
@@ -190,8 +192,10 @@ var _ = Describe("Out Command", func() {
 				manifest, err := out.NewManifest(request.Params.ManifestPath)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(manifest.EnvironmentVariables()).To(HaveLen(2))
-				Expect(manifest.EnvironmentVariables()).To(HaveKeyWithValue("MANIFEST_A", "manifest_a"))
-				Expect(manifest.EnvironmentVariables()).To(HaveKeyWithValue("MANIFEST_B", "manifest_b"))
+				Expect(manifest.EnvironmentVariables()[0]).To(HaveLen(2))
+				Expect(manifest.EnvironmentVariables()[0]).To(HaveKeyWithValue("MANIFEST_A", "manifest_a"))
+				Expect(manifest.EnvironmentVariables()[0]).To(HaveKeyWithValue("MANIFEST_B", "manifest_b"))
+				Expect(manifest.EnvironmentVariables()[1]).To(HaveLen(0))
 			})
 		})
 
