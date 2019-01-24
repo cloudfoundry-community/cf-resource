@@ -2,10 +2,8 @@ FROM golang:alpine as builder
 RUN apk add --no-cache curl jq
 RUN mkdir -p /assets
 WORKDIR /assets
-RUN curl -L "https://cli.run.pivotal.io/stable?release=linux64-binary&source=github-rel" | tar -xzf -
-RUN url=$(curl -s "https://api.github.com/repos/contraband/autopilot/releases/latest" \
-    | jq -r '.assets[] | select(.name == "autopilot-linux") | .browser_download_url') &&\
-    curl -L "$url" -o /assets/autopilot
+RUN curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -xzf -
+RUN curl -L "https://github.com/contraband/autopilot/releases/download/0.0.8/autopilot-linux" -o /assets/autopilot
 COPY . /go/src/github.com/concourse/cf-resource
 ENV CGO_ENABLED 0
 RUN go build -o /assets/in github.com/concourse/cf-resource/in/cmd/in
