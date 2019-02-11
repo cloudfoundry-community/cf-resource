@@ -1,5 +1,8 @@
-FROM golang:alpine as builder
-RUN apk add --no-cache curl jq
+FROM concourse/golang-builder as builder
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    jq \
+  && rm -rf /var/lib/apt/lists/*
 RUN mkdir -p /assets
 WORKDIR /assets
 RUN curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -xzf -
@@ -14,8 +17,11 @@ RUN set -e; for pkg in $(go list ./... | grep -v "acceptance"); do \
 		go test -o "/tests/$(basename $pkg).test" -c $pkg; \
 	done
 
-FROM alpine:edge AS resource
-RUN apk add --no-cache bash tzdata ca-certificates
+FROM ubuntu:bionic AS resource
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    tzdata \
+    ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
 COPY --from=builder assets/ /opt/resource/
 RUN chmod +x /opt/resource/*
 RUN mv /opt/resource/cf /usr/bin/cf
