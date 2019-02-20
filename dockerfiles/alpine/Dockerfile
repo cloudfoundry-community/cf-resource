@@ -3,7 +3,6 @@ RUN apk add --no-cache curl jq
 RUN mkdir -p /assets
 WORKDIR /assets
 RUN curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -xzf -
-RUN curl -L "https://github.com/contraband/autopilot/releases/download/0.0.8/autopilot-linux" -o /assets/autopilot
 COPY . /go/src/github.com/concourse/cf-resource
 ENV CGO_ENABLED 0
 RUN go build -o /assets/in github.com/concourse/cf-resource/in/cmd/in
@@ -19,8 +18,6 @@ RUN apk add --no-cache bash tzdata ca-certificates
 COPY --from=builder assets/ /opt/resource/
 RUN chmod +x /opt/resource/*
 RUN mv /opt/resource/cf /usr/bin/cf
-RUN mv /opt/resource/autopilot /usr/bin/autopilot
-RUN /usr/bin/cf install-plugin -f /usr/bin/autopilot
 
 FROM resource AS tests
 COPY --from=builder /tests /go-tests
