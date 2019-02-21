@@ -357,7 +357,7 @@ var _ = Describe("Out", func() {
 				Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 				Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
 				Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
-				Expect(session.Err).To(gbytes.Say("cf push -f %s",
+				Expect(session.Err).To(gbytes.Say("cf push -f %s -p .",
 					filepath.Join(tmpDir, "project/manifest.yml"),
 				))
 				Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))

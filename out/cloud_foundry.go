@@ -104,6 +104,7 @@ func (cf *CloudFoundry) simplePush(
 			return err
 		}
 		if stat.IsDir() {
+			args = append(args, "-p", ".")
 			return chdir(path, cf.cf(args...).Run)
 		}
 
