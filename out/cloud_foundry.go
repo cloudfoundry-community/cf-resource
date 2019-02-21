@@ -51,7 +51,7 @@ func (cf *CloudFoundry) PushApp(
 	vars map[string]interface{},
 	varsFiles []string,
 	dockerUser string,
-	showLogs bool, // not used anymore (autopilot would use it, standard cf push does not support it)
+	showLogs bool,
 	noStart bool,
 ) error {
 
@@ -63,7 +63,7 @@ func (cf *CloudFoundry) PushApp(
 		}
 
 		return rewind.Actions{
-			Actions:              cf.zeroDowntimeActions(currentAppName, pushFunction),
+			Actions:              cf.zeroDowntimeActions(currentAppName, pushFunction, showLogs),
 			RewindFailureMessage: "Oh no. Something's gone wrong. I've tried to roll back but you should check to see if everything is OK.",
 		}.Execute()
 	}
@@ -72,6 +72,7 @@ func (cf *CloudFoundry) PushApp(
 func (cf *CloudFoundry) zeroDowntimeActions(
 	currentAppName string,
 	pushFunction func() error,
+	showLogs bool,
 ) []rewind.Action {
 
 	venerableAppName := fmt.Sprintf("%s-venerable", currentAppName)
@@ -83,7 +84,9 @@ func (cf *CloudFoundry) zeroDowntimeActions(
 		{
 			Forward: pushFunction,
 			ReversePrevious: func() error {
-				_ = cf.cf("logs", "--recent", currentAppName).Run()
+				if showLogs {
+					_ = cf.cf("logs", "--recent", currentAppName).Run()
+				}
 				_ = cf.cf("delete", "-f", currentAppName).Run()
 				return cf.cf("rename", venerableAppName, currentAppName).Run()
 			},
