@@ -1,4 +1,4 @@
-package zdt
+package zdt_test
 
 import (
 	"errors"
@@ -7,20 +7,54 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/onsi/gomega/gbytes"
+
+	"github.com/concourse/cf-resource/out/zdt"
 )
 
-var _ = Describe("BuildActions", func() {
-	stdout := gbytes.NewBuffer()
+var stdout *gbytes.Buffer
 
-	cf := func(args ...string) *exec.Cmd {
-		cmd := exec.Command("assets/cf", args...)
+func cli(path string) func(args ...string) *exec.Cmd {
+	return func(args ...string) *exec.Cmd {
+		cmd := exec.Command(path, args...)
 		cmd.Stdout = stdout
 		return cmd
 	}
+}
+
+var _ = Describe("CanPush", func() {
+	cf := cli("assets/cf")
+	errCf := cli("assets/erroringCf")
+
+	BeforeEach(func() {
+		stdout = gbytes.NewBuffer()
+	})
+
+	It("needs a currentAppName", func() {
+		Expect(zdt.CanPush(cf, "")).To(BeFalse())
+		Expect(stdout.Contents()).To(BeEmpty())
+	})
+
+	It("needs the app to exist", func() {
+		Expect(zdt.CanPush(errCf, "my-app")).To(BeFalse())
+		Expect(stdout).To(gbytes.Say("cf app my-app"))
+	})
+
+	It("is ok when app exists", func() {
+		Expect(zdt.CanPush(cf, "my-app")).To(BeTrue())
+		Expect(stdout).To(gbytes.Say("cf app my-app"))
+	})
+})
+
+var _ = Describe("Push", func() {
+	cf := cli("assets/cf")
+
+	BeforeEach(func() {
+		stdout = gbytes.NewBuffer()
+	})
 
 	It("pushes an app with zero downtime", func() {
 		pushFunction := func() error { return cf("push", "my-app").Run() }
-		err := Push(cf, "my-app", pushFunction, false)
+		err := zdt.Push(cf, "my-app", pushFunction, false)
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(stdout).To(gbytes.Say("cf rename my-app my-app-venerable"))
@@ -34,7 +68,7 @@ var _ = Describe("BuildActions", func() {
 			_ = cf("push", "my-app").Run()
 			return pushErr
 		}
-		err := Push(cf, "my-app", pushFunction, false)
+		err := zdt.Push(cf, "my-app", pushFunction, false)
 
 		Expect(err).To(Equal(pushErr))
 		Expect(stdout).To(gbytes.Say("cf rename my-app my-app-venerable"))
@@ -49,7 +83,7 @@ var _ = Describe("BuildActions", func() {
 			_ = cf("push", "my-app").Run()
 			return errors.New("push failed")
 		}
-		err := Push(cf, "my-app", pushFunction, true)
+		err := zdt.Push(cf, "my-app", pushFunction, true)
 
 		Expect(err).To(HaveOccurred())
 		Expect(stdout).To(gbytes.Say("cf rename my-app my-app-venerable"))

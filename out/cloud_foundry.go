@@ -54,13 +54,13 @@ func (cf *CloudFoundry) PushApp(
 	noStart bool,
 ) error {
 
-	if currentAppName == "" {
-		return cf.simplePush(manifest, path, currentAppName, vars, varsFiles, dockerUser, noStart)
-	} else {
+	if zdt.CanPush(cf.cf, currentAppName) {
 		pushFunction := func() error {
 			return cf.simplePush(manifest, path, currentAppName, vars, varsFiles, dockerUser, noStart)
 		}
 		return zdt.Push(cf.cf, currentAppName, pushFunction, showLogs)
+	} else {
+		return cf.simplePush(manifest, path, currentAppName, vars, varsFiles, dockerUser, noStart)
 	}
 }
 

@@ -5,6 +5,21 @@ import (
 	"os/exec"
 )
 
+func CanPush(
+	cf func(args ...string) *exec.Cmd,
+	currentAppName string,
+) bool {
+
+	if currentAppName == "" {
+		return false
+	}
+
+	findErr := cf("app", currentAppName).Run()
+	appExists := findErr == nil
+
+	return appExists
+}
+
 func Push(
 	cf func(args ...string) *exec.Cmd,
 	currentAppName string,
