@@ -2,10 +2,9 @@ package out
 
 import (
 	"fmt"
+	"github.com/concourse/cf-resource/out/zdt"
 	"os"
 	"os/exec"
-
-	"github.com/concourse/cf-resource/out/rewind"
 )
 
 //go:generate counterfeiter . PAAS
@@ -61,39 +60,7 @@ func (cf *CloudFoundry) PushApp(
 		pushFunction := func() error {
 			return cf.simplePush(manifest, path, currentAppName, vars, varsFiles, dockerUser, noStart)
 		}
-
-		return rewind.Actions{
-			Actions:              cf.zeroDowntimeActions(currentAppName, pushFunction, showLogs),
-			RewindFailureMessage: "Oh no. Something's gone wrong. I've tried to roll back but you should check to see if everything is OK.",
-		}.Execute()
-	}
-}
-
-func (cf *CloudFoundry) zeroDowntimeActions(
-	currentAppName string,
-	pushFunction func() error,
-	showLogs bool,
-) []rewind.Action {
-
-	venerableAppName := fmt.Sprintf("%s-venerable", currentAppName)
-
-	return []rewind.Action{
-		{
-			Forward: cf.cf("rename", currentAppName, venerableAppName).Run,
-		},
-		{
-			Forward: pushFunction,
-			ReversePrevious: func() error {
-				if showLogs {
-					_ = cf.cf("logs", "--recent", currentAppName).Run()
-				}
-				_ = cf.cf("delete", "-f", currentAppName).Run()
-				return cf.cf("rename", venerableAppName, currentAppName).Run()
-			},
-		},
-		{
-			Forward: cf.cf("delete", "-f", venerableAppName).Run,
-		},
+		return zdt.Push(cf.cf, currentAppName, pushFunction, showLogs)
 	}
 }
 

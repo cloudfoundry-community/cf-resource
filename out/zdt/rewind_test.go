@@ -1,4 +1,4 @@
-package rewind_test
+package zdt_test
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/concourse/cf-resource/out/rewind"
+	"github.com/concourse/cf-resource/out/zdt"
 )
 
 var _ = Describe("Rewind", func() {
@@ -14,8 +14,8 @@ var _ = Describe("Rewind", func() {
 		firstRun := false
 		secondRun := false
 
-		actions := rewind.Actions{
-			Actions: []rewind.Action{
+		actions := zdt.Actions{
+			Actions: []zdt.Action{
 				{
 					Forward: func() error {
 						firstRun = true
@@ -38,14 +38,14 @@ var _ = Describe("Rewind", func() {
 		Expect(secondRun).To(BeTrue())
 	})
 
-	It("stops and runs the rewind of an action if it fails", func() {
+	It("stops and runs the zdt of an action if it fails", func() {
 		firstRun := false
 		secondRun := false
 		secondReverseRun := false
 		thirdRun := false
 
-		actions := rewind.Actions{
-			Actions: []rewind.Action{
+		actions := zdt.Actions{
+			Actions: []zdt.Action{
 				{
 					Forward: func() error {
 						firstRun = true
@@ -80,14 +80,14 @@ var _ = Describe("Rewind", func() {
 		Expect(thirdRun).To(BeFalse())
 	})
 
-	It("gives up if the rewind action fails", func() {
+	It("gives up if the zdt action fails", func() {
 		firstRun := false
 		secondRun := false
 		secondReverseRun := false
 		thirdRun := false
 
-		actions := rewind.Actions{
-			Actions: []rewind.Action{
+		actions := zdt.Actions{
+			Actions: []zdt.Action{
 				{
 					Forward: func() error {
 						firstRun = true
@@ -123,14 +123,14 @@ var _ = Describe("Rewind", func() {
 		Expect(thirdRun).To(BeFalse())
 	})
 
-	It("just returns the error if a rewind fails with no reverse message", func() {
+	It("just returns the error if a zdt fails with no reverse message", func() {
 		firstRun := false
 		secondRun := false
 		secondReverseRun := false
 		thirdRun := false
 
-		actions := rewind.Actions{
-			Actions: []rewind.Action{
+		actions := zdt.Actions{
+			Actions: []zdt.Action{
 				{
 					Forward: func() error {
 						firstRun = true
