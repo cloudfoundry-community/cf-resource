@@ -118,8 +118,9 @@ var _ = Describe("Out", func() {
 			Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 			// color should be always
-			Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
-			Eventually(session.Err).Should(gbytes.Say("CF_TRACE=/dev/stderr"))
+			output := string(session.Err.Contents())
+			Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
+			Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
 		})
 	})
 
@@ -155,8 +156,9 @@ var _ = Describe("Out", func() {
 			Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 			// color should be always
-			Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
-			Eventually(session.Err).Should(gbytes.Say("CF_TRACE=/dev/stderr"))
+			output := string(session.Err.Contents())
+			Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
+			Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
 		})
 	})
 
@@ -352,8 +354,9 @@ var _ = Describe("Out", func() {
 				Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 				// color should be always
-				Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
-				Eventually(session.Err).Should(gbytes.Say("CF_TRACE=/dev/stderr"))
+				output := string(session.Err.Contents())
+				Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
+				Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
 			})
 		})
 		Context("when no_start is specified", func() {
@@ -386,8 +389,9 @@ var _ = Describe("Out", func() {
 				Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
 
 				// color should be always
-				Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
-				Eventually(session.Err).Should(gbytes.Say("CF_TRACE=/dev/stderr"))
+				output := string(session.Err.Contents())
+				Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
+				Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
 			})
 		})
 	})
