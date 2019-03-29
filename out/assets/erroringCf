@@ -1,0 +1,5 @@
+#!/bin/bash
+
+./$(dirname $0)/cf $*
+
+exit 1

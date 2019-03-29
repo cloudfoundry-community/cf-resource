@@ -2,6 +2,7 @@ package out
 
 import (
 	"fmt"
+	"github.com/concourse/cf-resource/out/zdt"
 	"os"
 	"os/exec"
 )
@@ -44,25 +45,45 @@ func (cf *CloudFoundry) Target(organization string, space string) error {
 
 func (cf *CloudFoundry) PushApp(
 	manifest string,
-	path string, currentAppName string,
+	path string,
+	currentAppName string,
 	vars map[string]interface{},
 	varsFiles []string,
 	dockerUser string,
 	showLogs bool,
 	noStart bool,
 ) error {
-	args := []string{}
 
-	if currentAppName == "" {
-		args = append(args, "push", "-f", manifest)
-		if noStart {
-			args = append(args, "--no-start")
+	if zdt.CanPush(cf.cf, currentAppName) {
+		pushFunction := func() error {
+			return cf.simplePush(manifest, path, currentAppName, vars, varsFiles, dockerUser, noStart)
 		}
+		return zdt.Push(cf.cf, currentAppName, pushFunction, showLogs)
 	} else {
-		args = append(args, "zero-downtime-push", currentAppName, "-f", manifest)
-		if showLogs {
-			args = append(args, "--show-app-log")
-		}
+		return cf.simplePush(manifest, path, currentAppName, vars, varsFiles, dockerUser, noStart)
+	}
+}
+
+func (cf *CloudFoundry) simplePush(
+	manifest string,
+	path string,
+	currentAppName string,
+	vars map[string]interface{},
+	varsFiles []string,
+	dockerUser string,
+	noStart bool,
+) error {
+
+	args := []string{"push"}
+
+	if currentAppName != "" {
+		args = append(args, currentAppName)
+	}
+
+	args = append(args, "-f", manifest)
+
+	if noStart {
+		args = append(args, "--no-start")
 	}
 
 	for name, value := range vars {
@@ -83,6 +104,7 @@ func (cf *CloudFoundry) PushApp(
 			return err
 		}
 		if stat.IsDir() {
+			args = append(args, "-p", ".")
 			return chdir(path, cf.cf(args...).Run)
 		}
 
@@ -114,10 +136,7 @@ func (cf *CloudFoundry) cf(args ...string) *exec.Cmd {
 	cmd.Env = append(os.Environ(), "CF_COLOR=true", "CF_DIAL_TIMEOUT=30")
 
 	if cf.verbose {
-		// we have to set CF_TRACE to direct output directly to stderr due to a known issue in the CF CLI
-		// when used together with cli plugins like cf autopilot (as used by cf-resource)
-		// see also https://github.com/cloudfoundry/cli/blob/master/README.md#known-issues
-		cmd.Env = append(cmd.Env, "CF_TRACE=/dev/stderr")
+		cmd.Env = append(cmd.Env, "CF_TRACE=true")
 	}
 
 	return cmd

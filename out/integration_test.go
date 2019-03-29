@@ -112,15 +112,17 @@ var _ = Describe("Out", func() {
 			Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 			Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
 			Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
-			Expect(session.Err).To(gbytes.Say("cf zero-downtime-push awesome-app -f %s",
+			Expect(session.Err).To(gbytes.Say("cf rename awesome-app awesome-app-venerable"))
+			Expect(session.Err).To(gbytes.Say("cf push awesome-app -f %s",
 				filepath.Join(tmpDir, "project/manifest.yml"),
 			))
 			Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
+			Expect(session.Err).To(gbytes.Say("cf delete -f awesome-app-venerable"))
 
 			// color should be always
 			output := string(session.Err.Contents())
-			Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
-			Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
+			Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(7))
+			Expect(strings.Count(output, "CF_TRACE=true")).To(Equal(7))
 		})
 	})
 
@@ -150,15 +152,18 @@ var _ = Describe("Out", func() {
 			Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 			Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
 			Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
-			Expect(session.Err).To(gbytes.Say("cf zero-downtime-push awesome-app -f %s --var foo=bar --vars-file vars.yml",
+
+			Expect(session.Err).To(gbytes.Say("cf rename awesome-app awesome-app-venerable"))
+			Expect(session.Err).To(gbytes.Say("cf push awesome-app -f %s --var foo=bar --vars-file vars.yml",
 				filepath.Join(tmpDir, "project/manifest.yml"),
 			))
 			Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
+			Expect(session.Err).To(gbytes.Say("cf delete -f awesome-app-venerable"))
 
 			// color should be always
 			output := string(session.Err.Contents())
-			Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
-			Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
+			Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(7))
+			Expect(strings.Count(output, "CF_TRACE=true")).To(Equal(7))
 		})
 	})
 
@@ -199,10 +204,12 @@ var _ = Describe("Out", func() {
 				Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 				Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
 				Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
-				Expect(session.Err).To(gbytes.Say("cf zero-downtime-push awesome-app -f %s -p %s",
+				Expect(session.Err).To(gbytes.Say("cf rename awesome-app awesome-app-venerable"))
+				Expect(session.Err).To(gbytes.Say("cf push awesome-app -f %s -p %s",
 					tmpFileManifest.Name(),
 					tmpFileSearch.Name(),
 				))
+				Expect(session.Err).To(gbytes.Say("cf delete -f awesome-app-venerable"))
 
 				// color should be always
 				Eventually(session.Err).Should(gbytes.Say("CF_COLOR=true"))
@@ -316,10 +323,12 @@ var _ = Describe("Out", func() {
 			Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 			Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
 			Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
-			Expect(session.Err).To(gbytes.Say("cf zero-downtime-push awesome-app -f %s --docker-username %s",
+			Expect(session.Err).To(gbytes.Say("cf rename awesome-app awesome-app-venerable"))
+			Expect(session.Err).To(gbytes.Say("cf push awesome-app -f %s --docker-username %s",
 				filepath.Join(tmpDir, "project/manifest.yml"),
 				request.Params.DockerUsername,
 			))
+			Expect(session.Err).To(gbytes.Say("cf delete -f awesome-app-venerable"))
 			Expect(session.Err).To(gbytes.Say("CF_DOCKER_PASSWORD=DOCKER_PASSWORD"))
 		})
 	})
@@ -348,7 +357,7 @@ var _ = Describe("Out", func() {
 				Expect(session.Err).To(gbytes.Say("cf api https://api.run.pivotal.io --skip-ssl-validation"))
 				Expect(session.Err).To(gbytes.Say("cf auth awesome@example.com hunter2"))
 				Expect(session.Err).To(gbytes.Say("cf target -o org -s space"))
-				Expect(session.Err).To(gbytes.Say("cf push -f %s",
+				Expect(session.Err).To(gbytes.Say("cf push -f %s -p .",
 					filepath.Join(tmpDir, "project/manifest.yml"),
 				))
 				Expect(session.Err).To(gbytes.Say(filepath.Join(tmpDir, "another-project")))
@@ -356,7 +365,7 @@ var _ = Describe("Out", func() {
 				// color should be always
 				output := string(session.Err.Contents())
 				Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
-				Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
+				Expect(strings.Count(output, "CF_TRACE=true")).To(Equal(4))
 			})
 		})
 		Context("when no_start is specified", func() {
@@ -391,7 +400,7 @@ var _ = Describe("Out", func() {
 				// color should be always
 				output := string(session.Err.Contents())
 				Expect(strings.Count(output, "CF_COLOR=true")).To(Equal(4))
-				Expect(strings.Count(output, "CF_TRACE=/dev/stderr")).To(Equal(4))
+				Expect(strings.Count(output, "CF_TRACE=true")).To(Equal(4))
 			})
 		})
 	})
