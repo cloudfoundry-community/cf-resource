@@ -18,9 +18,15 @@ type Params struct {
 	DockerPassword       string                 `json:"docker_password"`
 	ShowAppLog           bool                   `json:"show_app_log"`
 	NoStart              bool                   `json:"no_start"`
+	CredentialsFile      string                 `json:"credentials_file"`
 }
 
 type Response struct {
 	Version  resource.Version        `json:"version"`
 	Metadata []resource.MetadataPair `json:"metadata"`
+}
+
+type Credentials struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }

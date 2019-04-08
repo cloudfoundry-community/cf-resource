@@ -1,6 +1,9 @@
 package out
 
 import (
+	"bytes"
+	"encoding/json"
+	"io/ioutil"
 	"time"
 
 	"os"
@@ -21,10 +24,26 @@ func NewCommand(paas PAAS) *Command {
 }
 
 func (command *Command) Run(request Request) (Response, error) {
+
+	var credentials Credentials
+
+	if request.Params.CredentialsFile != "" {
+		rawCredentialsFile, err := ioutil.ReadFile(request.Params.CredentialsFile)
+		if err != nil {
+			return Response{}, err
+		}
+
+		if err := json.NewDecoder(bytes.NewReader(rawCredentialsFile)).Decode(&credentials); err != nil {
+			return Response{}, err
+		}
+	} else {
+		credentials = Credentials{Password: request.Source.Password, Username:request.Source.Username}
+	}
+
 	err := command.paas.Login(
 		request.Source.API,
-		request.Source.Username,
-		request.Source.Password,
+		credentials.Username,
+		credentials.Password,
 		request.Source.ClientID,
 		request.Source.ClientSecret,
 		request.Source.SkipCertCheck,

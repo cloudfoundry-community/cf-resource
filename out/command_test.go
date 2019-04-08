@@ -255,6 +255,32 @@ var _ = Describe("Out Command", func() {
 			Expect(clientSecret).To(Equal("hunter2"))
 		})
 
+		It("lets users authenticate with runtime provided credentials through file", func() {
+			request = out.Request{
+				Source: resource.Source{
+					API:          "https://api.run.pivotal.io",
+					Organization: "secret",
+					Space:        "volcano-base",
+				},
+				Params: out.Params{
+					ManifestPath: "a/path/to/a/manifest.yml",
+					CredentialsFile: "assets/credentials.json",
+				},
+			}
+
+			_, err := command.Run(request)
+			Expect(err).NotTo(HaveOccurred())
+
+			By("logging in")
+			Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
+
+			_, username, password, clientID, clientSecret, _ := cloudFoundry.LoginArgsForCall(0)
+			Expect(username).To(Equal("awesome@pivotal.io"))
+			Expect(password).To(Equal("hunter2"))
+			Expect(clientID).To(Equal(""))
+			Expect(clientSecret).To(Equal(""))
+		})
+
 		It("lets people do a zero downtime deploy", func() {
 			request = out.Request{
 				Source: resource.Source{

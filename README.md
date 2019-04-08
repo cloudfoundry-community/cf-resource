@@ -44,6 +44,7 @@ be specified.
 * `docker_password`: *Optional.* This should be the users password when authenticating against a protected docker registry.
 * `show_app_log`: *Optional.* Tails the app log during startup, useful to debug issues when using blue/green deploys together with the `current_app_name` option.
 * `no_start`: *Optional.* Deploys the app but does not start it. This parameter is ignored when `current_app_name` is specified.
+* `credentials_file`: *Optional.* Reads username and password from a json file and overrides the source. This can be used to provide short-lived temporary technical users for deployment.
 
 ## Pipeline example
 
@@ -59,6 +60,23 @@ jobs:
     file: resource-web-app/build.yml
   - put: resource-deploy-web-app
     params:
+      manifest: build-output/manifest.yml
+      environment_variables:
+        key: value
+        key2: value2
+
+- name: job-deploy-app-with-dynamic-credentials
+  public: true
+  serial: true
+  plan:
+  - get: resource-web-app
+  - task: build
+    file: resource-web-app/build.yml
+  - task: get-credentials
+    file: resource-web-app/get-credentials.yml
+  - put: resource-deploy-web-app
+    params:
+      credentials_file: get-credentials-output/credentials.json
       manifest: build-output/manifest.yml
       environment_variables:
         key: value
