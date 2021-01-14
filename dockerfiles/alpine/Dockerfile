@@ -1,5 +1,8 @@
-FROM golang:alpine as builder
-RUN apk add --no-cache curl jq
+ARG base_image=alpine:latest
+ARG builder_image=concourse/golang-builder
+
+FROM ${builder_image} as builder
+RUN apt-get update && apt-get -y install curl
 RUN mkdir -p /assets
 WORKDIR /assets
 RUN curl -L "https://packages.cloudfoundry.org/stable?release=linux64-binary&source=github" | tar -xzf -
@@ -13,7 +16,7 @@ RUN set -e; for pkg in $(go list ./... | grep -v "acceptance"); do \
 		go test -o "/tests/$(basename $pkg).test" -c $pkg; \
 	done
 
-FROM alpine:edge AS resource
+FROM ${base_image} AS resource
 RUN apk add --no-cache bash tzdata ca-certificates
 COPY --from=builder assets/ /opt/resource/
 RUN chmod +x /opt/resource/*

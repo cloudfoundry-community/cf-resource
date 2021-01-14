@@ -1,4 +1,7 @@
-FROM concourse/golang-builder as builder
+ARG base_image
+ARG builder_image=concourse/golang-builder
+
+FROM ${builder_image} as builder
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     jq \
@@ -17,7 +20,7 @@ RUN set -e; for pkg in $(go list ./... | grep -v "acceptance"); do \
 		go test -o "/tests/$(basename $pkg).test" -c $pkg; \
 	done
 
-FROM ubuntu:bionic AS resource
+FROM ${base_image} AS resource
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tzdata \
     ca-certificates \
