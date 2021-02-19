@@ -11,7 +11,7 @@ import (
 type PAAS interface {
 	Login(api string, username string, password string, clientID string, clientSecret string, insecure bool) error
 	Target(organization string, space string) error
-	PushApp(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool) error
+	PushApp(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool, diskLimit string, memory string) error
 }
 
 type CloudFoundry struct {
@@ -52,6 +52,7 @@ func (cf *CloudFoundry) PushApp(
 	dockerUser string,
 	showLogs bool,
 	noStart bool,
+	diskLimit string, memory string,
 ) error {
 
 	if zdt.CanPush(cf.cf, currentAppName) {
@@ -96,6 +97,14 @@ func (cf *CloudFoundry) simplePush(
 
 	if dockerUser != "" {
 		args = append(args, "--docker-username", dockerUser)
+	}
+
+	if diskLimit != "" {
+		args = append(args, "-k", diskLimit)
+	}
+
+	if memory != "" {
+		args = append(args, "-m", memory)
 	}
 
 	if path != "" {
