@@ -1,3 +1,4 @@
+
 package out_test
 
 import (
@@ -44,6 +45,59 @@ var _ = Describe("Out Command", func() {
 	})
 
 	Describe("running the command", func() {
+		Context("when requesting rolling deployments", func() {
+			BeforeEach(func() {
+				request.Params.UseRollingAppDeployment = true
+			})
+			It("pushes an application using cf v3-zdt-push", func() {
+				response, err := command.Run(request)
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(response.Version.Timestamp).To(BeTemporally("~", time.Now(), time.Second))
+				Expect(response.Metadata[0]).To(Equal(
+					resource.MetadataPair{
+						Name:  "organization",
+						Value: "secret",
+					},
+				))
+				Expect(response.Metadata[1]).To(Equal(
+					resource.MetadataPair{
+						Name:  "space",
+						Value: "volcano-base",
+					},
+				))
+
+				By("logging in")
+				Expect(cloudFoundry.LoginCallCount()).To(Equal(1))
+
+				api, username, password, clientID, clientSecret, insecure := cloudFoundry.LoginArgsForCall(0)
+				Expect(api).To(Equal("https://api.run.pivotal.io"))
+				Expect(username).To(Equal("awesome@example.com"))
+				Expect(password).To(Equal("hunter2"))
+				Expect(clientID).To(Equal(""))
+				Expect(clientSecret).To(Equal(""))
+				Expect(insecure).To(Equal(false))
+
+				By("targeting the organization and space")
+				Expect(cloudFoundry.TargetCallCount()).To(Equal(1))
+
+				org, space := cloudFoundry.TargetArgsForCall(0)
+				Expect(org).To(Equal("secret"))
+				Expect(space).To(Equal("volcano-base"))
+
+				By("pushing the app")
+				Expect(cloudFoundry.PushAppCallCount()).To(Equal(0))
+				Expect(cloudFoundry.PushAppWithRollingDeploymentCallCount()).To(Equal(1))
+
+				path, currentAppName, dockerUser, showAppLog, noStart, manifest := cloudFoundry.PushAppWithRollingDeploymentArgsForCall(0)
+				Expect(path).To(Equal(""))
+				Expect(currentAppName).To(Equal(""))
+				Expect(dockerUser).To(Equal(""))
+				Expect(showAppLog).To(Equal(false))
+				Expect(noStart).To(Equal(false))
+				Expect(manifest).To(Equal("assets/manifest.yml"))
+			})
+		})
 		It("pushes an application into cloud foundry", func() {
 			response, err := command.Run(request)
 			Expect(err).NotTo(HaveOccurred())
@@ -82,6 +136,7 @@ var _ = Describe("Out Command", func() {
 
 			By("pushing the app")
 			Expect(cloudFoundry.PushAppCallCount()).To(Equal(1))
+			Expect(cloudFoundry.PushAppWithRollingDeploymentCallCount()).To(Equal(0))
 
 			manifest, path, currentAppName, vars, varsFiles, dockerUser, showAppLog, noStart := cloudFoundry.PushAppArgsForCall(0)
 			Expect(manifest).To(Equal(request.Params.ManifestPath))

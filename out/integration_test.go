@@ -93,6 +93,8 @@ var _ = Describe("Out", func() {
 
 	Context("when my manifest and paths do not contain a glob", func() {
 		It("pushes an application to cloud foundry", func() {
+			fmt.Printf("command: %s\n", binPath)
+
 			session, err := gexec.Start(
 				cmd,
 				GinkgoWriter,
