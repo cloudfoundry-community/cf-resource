@@ -1,6 +1,8 @@
 package out
 
-import "github.com/concourse/cf-resource"
+import (
+	"github.com/concourse/cf-resource"
+)
 
 type Request struct {
 	Source resource.Source `json:"source"`
@@ -18,6 +20,8 @@ type Params struct {
 	DockerPassword       string                 `json:"docker_password"`
 	ShowAppLog           bool                   `json:"show_app_log"`
 	NoStart              bool                   `json:"no_start"`
+	DiskLimit			 string					`json:"disk_limit"`
+	Memory				 string					`json:"memory"`
 }
 
 type Response struct {

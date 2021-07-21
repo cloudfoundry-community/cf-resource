@@ -58,6 +58,8 @@ func (command *Command) Run(request Request) (Response, error) {
 		request.Params.DockerUsername,
 		request.Params.ShowAppLog,
 		request.Params.NoStart,
+		request.Params.DiskLimit,
+		request.Params.Memory,
 	)
 	if err != nil {
 		return Response{}, err

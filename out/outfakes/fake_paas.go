@@ -36,7 +36,7 @@ type FakePAAS struct {
 	targetReturnsOnCall map[int]struct {
 		result1 error
 	}
-	PushAppStub        func(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool) error
+	PushAppStub        func(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool, diskLimit string, memory string,) error
 	pushAppMutex       sync.RWMutex
 	pushAppArgsForCall []struct {
 		manifest       string
@@ -47,6 +47,8 @@ type FakePAAS struct {
 		dockerUser     string
 		showLogs       bool
 		noStart        bool
+		diskLimit		string
+		memory		string
 	}
 	pushAppReturns struct {
 		result1 error
@@ -160,7 +162,7 @@ func (fake *FakePAAS) TargetReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool) error {
+func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool, diskLimit string, memory string) error {
 	var varsFilesCopy []string
 	if varsFiles != nil {
 		varsFilesCopy = make([]string, len(varsFiles))
@@ -177,11 +179,13 @@ func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName strin
 		dockerUser     string
 		showLogs       bool
 		noStart        bool
-	}{manifest, path, currentAppName, vars, varsFilesCopy, dockerUser, showLogs, noStart})
+		diskLimit			 string
+		memory				 string
+	}{manifest, path, currentAppName, vars, varsFilesCopy, dockerUser, showLogs, noStart, diskLimit,memory})
 	fake.recordInvocation("PushApp", []interface{}{manifest, path, currentAppName, vars, varsFilesCopy, dockerUser, showLogs, noStart})
 	fake.pushAppMutex.Unlock()
 	if fake.PushAppStub != nil {
-		return fake.PushAppStub(manifest, path, currentAppName, vars, varsFiles, dockerUser, showLogs, noStart)
+		return fake.PushAppStub(manifest, path, currentAppName, vars, varsFiles, dockerUser, showLogs, noStart, diskLimit, memory)
 	}
 	if specificReturn {
 		return ret.result1
