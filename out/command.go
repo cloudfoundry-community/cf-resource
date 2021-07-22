@@ -1,9 +1,8 @@
 package out
 
 import (
-	"time"
-
 	"os"
+	"time"
 
 	"github.com/concourse/cf-resource"
 )
@@ -48,17 +47,27 @@ func (command *Command) Run(request Request) (Response, error) {
 	if request.Params.DockerPassword != "" {
 		os.Setenv(CfDockerPassword, request.Params.DockerPassword)
 	}
-
-	err = command.paas.PushApp(
-		request.Params.ManifestPath,
-		request.Params.Path,
-		request.Params.CurrentAppName,
-		request.Params.Vars,
-		request.Params.VarsFiles,
-		request.Params.DockerUsername,
-		request.Params.ShowAppLog,
-		request.Params.NoStart,
-	)
+	if request.Params.UseRollingAppDeployment {
+		err = command.paas.PushAppWithRollingDeployment(
+			request.Params.Path,
+			request.Params.CurrentAppName,
+			request.Params.DockerUsername,
+			request.Params.ShowAppLog,
+			request.Params.NoStart,
+			request.Params.ManifestPath,
+		)
+	} else {
+		err = command.paas.PushApp(
+			request.Params.ManifestPath,
+			request.Params.Path,
+			request.Params.CurrentAppName,
+			request.Params.Vars,
+			request.Params.VarsFiles,
+			request.Params.DockerUsername,
+			request.Params.ShowAppLog,
+			request.Params.NoStart,
+		)
+	}
 	if err != nil {
 		return Response{}, err
 	}

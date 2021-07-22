@@ -8,15 +8,27 @@ import (
 )
 
 type FakePAAS struct {
-	LoginStub        func(api string, username string, password string, clientID string, clientSecret string, insecure bool) error
+	ApplyManifestStub        func(string, string) error
+	applyManifestMutex       sync.RWMutex
+	applyManifestArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	applyManifestReturns struct {
+		result1 error
+	}
+	applyManifestReturnsOnCall map[int]struct {
+		result1 error
+	}
+	LoginStub        func(string, string, string, string, string, bool) error
 	loginMutex       sync.RWMutex
 	loginArgsForCall []struct {
-		api          string
-		username     string
-		password     string
-		clientID     string
-		clientSecret string
-		insecure     bool
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+		arg6 bool
 	}
 	loginReturns struct {
 		result1 error
@@ -24,29 +36,17 @@ type FakePAAS struct {
 	loginReturnsOnCall map[int]struct {
 		result1 error
 	}
-	TargetStub        func(organization string, space string) error
-	targetMutex       sync.RWMutex
-	targetArgsForCall []struct {
-		organization string
-		space        string
-	}
-	targetReturns struct {
-		result1 error
-	}
-	targetReturnsOnCall map[int]struct {
-		result1 error
-	}
-	PushAppStub        func(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool) error
+	PushAppStub        func(string, string, string, map[string]interface{}, []string, string, bool, bool) error
 	pushAppMutex       sync.RWMutex
 	pushAppArgsForCall []struct {
-		manifest       string
-		path           string
-		currentAppName string
-		vars           map[string]interface{}
-		varsFiles      []string
-		dockerUser     string
-		showLogs       bool
-		noStart        bool
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]interface{}
+		arg5 []string
+		arg6 string
+		arg7 bool
+		arg8 bool
 	}
 	pushAppReturns struct {
 		result1 error
@@ -54,30 +54,120 @@ type FakePAAS struct {
 	pushAppReturnsOnCall map[int]struct {
 		result1 error
 	}
+	PushAppWithRollingDeploymentStub        func(string, string, string, bool, bool, string) error
+	pushAppWithRollingDeploymentMutex       sync.RWMutex
+	pushAppWithRollingDeploymentArgsForCall []struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 bool
+		arg5 bool
+		arg6 string
+	}
+	pushAppWithRollingDeploymentReturns struct {
+		result1 error
+	}
+	pushAppWithRollingDeploymentReturnsOnCall map[int]struct {
+		result1 error
+	}
+	TargetStub        func(string, string) error
+	targetMutex       sync.RWMutex
+	targetArgsForCall []struct {
+		arg1 string
+		arg2 string
+	}
+	targetReturns struct {
+		result1 error
+	}
+	targetReturnsOnCall map[int]struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *FakePAAS) Login(api string, username string, password string, clientID string, clientSecret string, insecure bool) error {
-	fake.loginMutex.Lock()
-	ret, specificReturn := fake.loginReturnsOnCall[len(fake.loginArgsForCall)]
-	fake.loginArgsForCall = append(fake.loginArgsForCall, struct {
-		api          string
-		username     string
-		password     string
-		clientID     string
-		clientSecret string
-		insecure     bool
-	}{api, username, password, clientID, clientSecret, insecure})
-	fake.recordInvocation("Login", []interface{}{api, username, password, clientID, clientSecret, insecure})
-	fake.loginMutex.Unlock()
-	if fake.LoginStub != nil {
-		return fake.LoginStub(api, username, password, clientID, clientSecret, insecure)
+func (fake *FakePAAS) ApplyManifest(arg1 string, arg2 string) error {
+	fake.applyManifestMutex.Lock()
+	ret, specificReturn := fake.applyManifestReturnsOnCall[len(fake.applyManifestArgsForCall)]
+	fake.applyManifestArgsForCall = append(fake.applyManifestArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("ApplyManifest", []interface{}{arg1, arg2})
+	fake.applyManifestMutex.Unlock()
+	if fake.ApplyManifestStub != nil {
+		return fake.ApplyManifestStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.loginReturns.result1
+	fakeReturns := fake.applyManifestReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakePAAS) ApplyManifestCallCount() int {
+	fake.applyManifestMutex.RLock()
+	defer fake.applyManifestMutex.RUnlock()
+	return len(fake.applyManifestArgsForCall)
+}
+
+func (fake *FakePAAS) ApplyManifestCalls(stub func(string, string) error) {
+	fake.applyManifestMutex.Lock()
+	defer fake.applyManifestMutex.Unlock()
+	fake.ApplyManifestStub = stub
+}
+
+func (fake *FakePAAS) ApplyManifestArgsForCall(i int) (string, string) {
+	fake.applyManifestMutex.RLock()
+	defer fake.applyManifestMutex.RUnlock()
+	argsForCall := fake.applyManifestArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakePAAS) ApplyManifestReturns(result1 error) {
+	fake.applyManifestMutex.Lock()
+	defer fake.applyManifestMutex.Unlock()
+	fake.ApplyManifestStub = nil
+	fake.applyManifestReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakePAAS) ApplyManifestReturnsOnCall(i int, result1 error) {
+	fake.applyManifestMutex.Lock()
+	defer fake.applyManifestMutex.Unlock()
+	fake.ApplyManifestStub = nil
+	if fake.applyManifestReturnsOnCall == nil {
+		fake.applyManifestReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.applyManifestReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakePAAS) Login(arg1 string, arg2 string, arg3 string, arg4 string, arg5 string, arg6 bool) error {
+	fake.loginMutex.Lock()
+	ret, specificReturn := fake.loginReturnsOnCall[len(fake.loginArgsForCall)]
+	fake.loginArgsForCall = append(fake.loginArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 string
+		arg5 string
+		arg6 bool
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.recordInvocation("Login", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.loginMutex.Unlock()
+	if fake.LoginStub != nil {
+		return fake.LoginStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.loginReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakePAAS) LoginCallCount() int {
@@ -86,13 +176,22 @@ func (fake *FakePAAS) LoginCallCount() int {
 	return len(fake.loginArgsForCall)
 }
 
+func (fake *FakePAAS) LoginCalls(stub func(string, string, string, string, string, bool) error) {
+	fake.loginMutex.Lock()
+	defer fake.loginMutex.Unlock()
+	fake.LoginStub = stub
+}
+
 func (fake *FakePAAS) LoginArgsForCall(i int) (string, string, string, string, string, bool) {
 	fake.loginMutex.RLock()
 	defer fake.loginMutex.RUnlock()
-	return fake.loginArgsForCall[i].api, fake.loginArgsForCall[i].username, fake.loginArgsForCall[i].password, fake.loginArgsForCall[i].clientID, fake.loginArgsForCall[i].clientSecret, fake.loginArgsForCall[i].insecure
+	argsForCall := fake.loginArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
 }
 
 func (fake *FakePAAS) LoginReturns(result1 error) {
+	fake.loginMutex.Lock()
+	defer fake.loginMutex.Unlock()
 	fake.LoginStub = nil
 	fake.loginReturns = struct {
 		result1 error
@@ -100,6 +199,8 @@ func (fake *FakePAAS) LoginReturns(result1 error) {
 }
 
 func (fake *FakePAAS) LoginReturnsOnCall(i int, result1 error) {
+	fake.loginMutex.Lock()
+	defer fake.loginMutex.Unlock()
 	fake.LoginStub = nil
 	if fake.loginReturnsOnCall == nil {
 		fake.loginReturnsOnCall = make(map[int]struct {
@@ -111,82 +212,34 @@ func (fake *FakePAAS) LoginReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *FakePAAS) Target(organization string, space string) error {
-	fake.targetMutex.Lock()
-	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
-	fake.targetArgsForCall = append(fake.targetArgsForCall, struct {
-		organization string
-		space        string
-	}{organization, space})
-	fake.recordInvocation("Target", []interface{}{organization, space})
-	fake.targetMutex.Unlock()
-	if fake.TargetStub != nil {
-		return fake.TargetStub(organization, space)
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.targetReturns.result1
-}
-
-func (fake *FakePAAS) TargetCallCount() int {
-	fake.targetMutex.RLock()
-	defer fake.targetMutex.RUnlock()
-	return len(fake.targetArgsForCall)
-}
-
-func (fake *FakePAAS) TargetArgsForCall(i int) (string, string) {
-	fake.targetMutex.RLock()
-	defer fake.targetMutex.RUnlock()
-	return fake.targetArgsForCall[i].organization, fake.targetArgsForCall[i].space
-}
-
-func (fake *FakePAAS) TargetReturns(result1 error) {
-	fake.TargetStub = nil
-	fake.targetReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakePAAS) TargetReturnsOnCall(i int, result1 error) {
-	fake.TargetStub = nil
-	if fake.targetReturnsOnCall == nil {
-		fake.targetReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.targetReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *FakePAAS) PushApp(manifest string, path string, currentAppName string, vars map[string]interface{}, varsFiles []string, dockerUser string, showLogs bool, noStart bool) error {
-	var varsFilesCopy []string
-	if varsFiles != nil {
-		varsFilesCopy = make([]string, len(varsFiles))
-		copy(varsFilesCopy, varsFiles)
+func (fake *FakePAAS) PushApp(arg1 string, arg2 string, arg3 string, arg4 map[string]interface{}, arg5 []string, arg6 string, arg7 bool, arg8 bool) error {
+	var arg5Copy []string
+	if arg5 != nil {
+		arg5Copy = make([]string, len(arg5))
+		copy(arg5Copy, arg5)
 	}
 	fake.pushAppMutex.Lock()
 	ret, specificReturn := fake.pushAppReturnsOnCall[len(fake.pushAppArgsForCall)]
 	fake.pushAppArgsForCall = append(fake.pushAppArgsForCall, struct {
-		manifest       string
-		path           string
-		currentAppName string
-		vars           map[string]interface{}
-		varsFiles      []string
-		dockerUser     string
-		showLogs       bool
-		noStart        bool
-	}{manifest, path, currentAppName, vars, varsFilesCopy, dockerUser, showLogs, noStart})
-	fake.recordInvocation("PushApp", []interface{}{manifest, path, currentAppName, vars, varsFilesCopy, dockerUser, showLogs, noStart})
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 map[string]interface{}
+		arg5 []string
+		arg6 string
+		arg7 bool
+		arg8 bool
+	}{arg1, arg2, arg3, arg4, arg5Copy, arg6, arg7, arg8})
+	fake.recordInvocation("PushApp", []interface{}{arg1, arg2, arg3, arg4, arg5Copy, arg6, arg7, arg8})
 	fake.pushAppMutex.Unlock()
 	if fake.PushAppStub != nil {
-		return fake.PushAppStub(manifest, path, currentAppName, vars, varsFiles, dockerUser, showLogs, noStart)
+		return fake.PushAppStub(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.pushAppReturns.result1
+	fakeReturns := fake.pushAppReturns
+	return fakeReturns.result1
 }
 
 func (fake *FakePAAS) PushAppCallCount() int {
@@ -195,13 +248,22 @@ func (fake *FakePAAS) PushAppCallCount() int {
 	return len(fake.pushAppArgsForCall)
 }
 
+func (fake *FakePAAS) PushAppCalls(stub func(string, string, string, map[string]interface{}, []string, string, bool, bool) error) {
+	fake.pushAppMutex.Lock()
+	defer fake.pushAppMutex.Unlock()
+	fake.PushAppStub = stub
+}
+
 func (fake *FakePAAS) PushAppArgsForCall(i int) (string, string, string, map[string]interface{}, []string, string, bool, bool) {
 	fake.pushAppMutex.RLock()
 	defer fake.pushAppMutex.RUnlock()
-	return fake.pushAppArgsForCall[i].manifest, fake.pushAppArgsForCall[i].path, fake.pushAppArgsForCall[i].currentAppName, fake.pushAppArgsForCall[i].vars, fake.pushAppArgsForCall[i].varsFiles, fake.pushAppArgsForCall[i].dockerUser, fake.pushAppArgsForCall[i].showLogs, fake.pushAppArgsForCall[i].noStart
+	argsForCall := fake.pushAppArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6, argsForCall.arg7, argsForCall.arg8
 }
 
 func (fake *FakePAAS) PushAppReturns(result1 error) {
+	fake.pushAppMutex.Lock()
+	defer fake.pushAppMutex.Unlock()
 	fake.PushAppStub = nil
 	fake.pushAppReturns = struct {
 		result1 error
@@ -209,6 +271,8 @@ func (fake *FakePAAS) PushAppReturns(result1 error) {
 }
 
 func (fake *FakePAAS) PushAppReturnsOnCall(i int, result1 error) {
+	fake.pushAppMutex.Lock()
+	defer fake.pushAppMutex.Unlock()
 	fake.PushAppStub = nil
 	if fake.pushAppReturnsOnCall == nil {
 		fake.pushAppReturnsOnCall = make(map[int]struct {
@@ -220,15 +284,145 @@ func (fake *FakePAAS) PushAppReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
+func (fake *FakePAAS) PushAppWithRollingDeployment(arg1 string, arg2 string, arg3 string, arg4 bool, arg5 bool, arg6 string) error {
+	fake.pushAppWithRollingDeploymentMutex.Lock()
+	ret, specificReturn := fake.pushAppWithRollingDeploymentReturnsOnCall[len(fake.pushAppWithRollingDeploymentArgsForCall)]
+	fake.pushAppWithRollingDeploymentArgsForCall = append(fake.pushAppWithRollingDeploymentArgsForCall, struct {
+		arg1 string
+		arg2 string
+		arg3 string
+		arg4 bool
+		arg5 bool
+		arg6 string
+	}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.recordInvocation("PushAppWithRollingDeployment", []interface{}{arg1, arg2, arg3, arg4, arg5, arg6})
+	fake.pushAppWithRollingDeploymentMutex.Unlock()
+	if fake.PushAppWithRollingDeploymentStub != nil {
+		return fake.PushAppWithRollingDeploymentStub(arg1, arg2, arg3, arg4, arg5, arg6)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.pushAppWithRollingDeploymentReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakePAAS) PushAppWithRollingDeploymentCallCount() int {
+	fake.pushAppWithRollingDeploymentMutex.RLock()
+	defer fake.pushAppWithRollingDeploymentMutex.RUnlock()
+	return len(fake.pushAppWithRollingDeploymentArgsForCall)
+}
+
+func (fake *FakePAAS) PushAppWithRollingDeploymentCalls(stub func(string, string, string, bool, bool, string) error) {
+	fake.pushAppWithRollingDeploymentMutex.Lock()
+	defer fake.pushAppWithRollingDeploymentMutex.Unlock()
+	fake.PushAppWithRollingDeploymentStub = stub
+}
+
+func (fake *FakePAAS) PushAppWithRollingDeploymentArgsForCall(i int) (string, string, string, bool, bool, string) {
+	fake.pushAppWithRollingDeploymentMutex.RLock()
+	defer fake.pushAppWithRollingDeploymentMutex.RUnlock()
+	argsForCall := fake.pushAppWithRollingDeploymentArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2, argsForCall.arg3, argsForCall.arg4, argsForCall.arg5, argsForCall.arg6
+}
+
+func (fake *FakePAAS) PushAppWithRollingDeploymentReturns(result1 error) {
+	fake.pushAppWithRollingDeploymentMutex.Lock()
+	defer fake.pushAppWithRollingDeploymentMutex.Unlock()
+	fake.PushAppWithRollingDeploymentStub = nil
+	fake.pushAppWithRollingDeploymentReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakePAAS) PushAppWithRollingDeploymentReturnsOnCall(i int, result1 error) {
+	fake.pushAppWithRollingDeploymentMutex.Lock()
+	defer fake.pushAppWithRollingDeploymentMutex.Unlock()
+	fake.PushAppWithRollingDeploymentStub = nil
+	if fake.pushAppWithRollingDeploymentReturnsOnCall == nil {
+		fake.pushAppWithRollingDeploymentReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.pushAppWithRollingDeploymentReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakePAAS) Target(arg1 string, arg2 string) error {
+	fake.targetMutex.Lock()
+	ret, specificReturn := fake.targetReturnsOnCall[len(fake.targetArgsForCall)]
+	fake.targetArgsForCall = append(fake.targetArgsForCall, struct {
+		arg1 string
+		arg2 string
+	}{arg1, arg2})
+	fake.recordInvocation("Target", []interface{}{arg1, arg2})
+	fake.targetMutex.Unlock()
+	if fake.TargetStub != nil {
+		return fake.TargetStub(arg1, arg2)
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.targetReturns
+	return fakeReturns.result1
+}
+
+func (fake *FakePAAS) TargetCallCount() int {
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
+	return len(fake.targetArgsForCall)
+}
+
+func (fake *FakePAAS) TargetCalls(stub func(string, string) error) {
+	fake.targetMutex.Lock()
+	defer fake.targetMutex.Unlock()
+	fake.TargetStub = stub
+}
+
+func (fake *FakePAAS) TargetArgsForCall(i int) (string, string) {
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
+	argsForCall := fake.targetArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
+}
+
+func (fake *FakePAAS) TargetReturns(result1 error) {
+	fake.targetMutex.Lock()
+	defer fake.targetMutex.Unlock()
+	fake.TargetStub = nil
+	fake.targetReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *FakePAAS) TargetReturnsOnCall(i int, result1 error) {
+	fake.targetMutex.Lock()
+	defer fake.targetMutex.Unlock()
+	fake.TargetStub = nil
+	if fake.targetReturnsOnCall == nil {
+		fake.targetReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.targetReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *FakePAAS) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.applyManifestMutex.RLock()
+	defer fake.applyManifestMutex.RUnlock()
 	fake.loginMutex.RLock()
 	defer fake.loginMutex.RUnlock()
-	fake.targetMutex.RLock()
-	defer fake.targetMutex.RUnlock()
 	fake.pushAppMutex.RLock()
 	defer fake.pushAppMutex.RUnlock()
+	fake.pushAppWithRollingDeploymentMutex.RLock()
+	defer fake.pushAppWithRollingDeploymentMutex.RUnlock()
+	fake.targetMutex.RLock()
+	defer fake.targetMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value
